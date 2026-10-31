@@ -1,0 +1,94 @@
+<section class="user-form">
+  <div class="header">
+    <div>
+      <h2>{{ isEdit ? 'Editar usuario' : 'Nuevo usuario' }}</h2>
+      <p>Completa la información necesaria para guardar el usuario.</p>
+    </div>
+    <a routerLink="/users" class="ghost">Volver</a>
+  </div>
+
+  <form class="card" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="grid">
+      <label>
+        <span>Nombre</span>
+        <input type="text" formControlName="nombre" placeholder="Juan Pérez" 
+        />
+
+        <div class="error" *ngIf="form.controls.nombre.touched && form.controls.nombre.invalid">
+        El nombre es obligatorio y debe tener mínimo 3 caracteres.
+        </div>
+      </label>
+
+      <label>
+  <span>Usuario</span>
+  <input
+    type="text"
+    formControlName="usuario"
+    placeholder="juan123"
+    autocomplete="username"
+    [readonly]="isEdit"
+  />
+
+  <div class="error" *ngIf="form.controls.usuario.touched && form.controls.usuario.invalid">
+    El usuario es obligatorio y debe tener mínimo 3 caracteres.
+  </div>
+</label>
+
+      <label>
+        <span>Correo</span>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="correo@empresa.com"
+          autocomplete="email"
+          [readonly]="isEdit"
+        />
+        <div class="error" *ngIf="form.controls.email.touched && form.controls.email.invalid">
+        Ingresa un correo válido.
+        </div>
+      </label>
+
+      <label>
+        <span>Rol</span>
+        <select formControlName="roleId">
+          <option [value]="1">Administrador</option>
+          <option [value]="2">Usuario</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Teléfono (opcional)</span>
+        <input
+          type="text"
+          formControlName="telefonoNumero"
+          placeholder="9999-9999"
+        />
+      </label>
+
+      <label class="checkbox">
+        <span>Activo</span>
+        <input type="checkbox" formControlName="estado" />
+      </label>
+    </div>
+
+    <label class="password">
+      <span>Contraseña {{ isEdit ? '(opcional)' : '' }}</span>
+      <input
+        type="password"
+        formControlName="password"
+        placeholder="Mínimo 6 caracteres"
+        autocomplete="new-password"
+      />
+      <div class="error" *ngIf="form.controls.password.touched && form.controls.password.invalid">
+      La contraseña debe tener mínimo 6 caracteres.
+      </div>
+    </label>
+
+    <div class="actions">
+      <button type="submit" class="primary" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Guardando...' : 'Guardar' }}
+      </button>
+      <span class="error" *ngIf="errorMessage">{{ errorMessage }}</span>
+    </div>
+  </form>
+</section>

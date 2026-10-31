@@ -1,0 +1,147 @@
+<section class="roles-list">
+  <div class="section-header">
+    <div>
+      <h2>Roles</h2>
+      <p>Administra los roles del sistema.</p>
+    </div>
+
+    <div class="header-actions">
+      <a routerLink="/users" class="admin-tab">Usuarios</a>
+      <a routerLink="/roles" class="admin-tab active">Roles</a>
+
+      <button
+        class="primary admin-main-button"
+        type="button"
+        (click)="newRole()"
+      >
+        Nuevo rol
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="error()" class="alert error">
+    {{ error() }}
+  </div>
+
+  <div *ngIf="success()" class="alert success">
+    {{ success() }}
+  </div>
+
+  <div *ngIf="showForm()" class="form-card">
+    <h3>{{ editingRoleId() ? 'Editar rol' : 'Nuevo rol' }}</h3>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Nombre</label>
+        <input
+          type="text"
+          [(ngModel)]="form.nombre"
+          placeholder="Ejemplo: Vendedor"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Descripción</label>
+        <input
+          type="text"
+          [(ngModel)]="form.descripcion"
+          placeholder="Descripción del rol"
+        />
+      </div>
+
+      <div class="form-group" *ngIf="editingRoleId()">
+        <label>Estado</label>
+        <select [(ngModel)]="form.estado">
+          <option [ngValue]="true">Activo</option>
+          <option [ngValue]="false">Inactivo</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="secondary" type="button" (click)="cancelForm()">
+        Cancelar
+      </button>
+
+      <button
+        class="primary admin-main-button"
+        type="button"
+        [disabled]="saving()"
+        (click)="saveRole()"
+      >
+        {{ saving() ? 'Guardando...' : 'Guardar' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div *ngIf="loading()" class="loading">
+      Cargando roles...
+    </div>
+
+    <table *ngIf="!loading()">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Estado</th>
+          <th>Fecha creación</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let role of roles()">
+
+          <td>
+            <strong>{{ role.nombre }}</strong>
+            <span *ngIf="isAdminRole(role)" class="admin-badge">
+              Protegido
+            </span>
+          </td>
+
+          <td>{{ role.descripcion || 'Sin descripción' }}</td>
+
+          <td>
+            <span
+              class="status"
+              [class.active]="role.estado"
+              [class.inactive]="!role.estado"
+            >
+              {{ role.estado ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+
+          <td>
+            {{
+              role.fechaCreacion
+                ? (role.fechaCreacion | date: 'dd/MM/yyyy')
+                : '-'
+            }}
+          </td>
+
+          <td class="actions">
+            <button class="ghost" type="button" (click)="editRole(role)">
+              Editar
+            </button>
+
+            <button
+              class="danger"
+              type="button"
+              [disabled]="isAdminRole(role)"
+              (click)="deleteRole(role)"
+            >
+              Eliminar
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="roles().length === 0">
+          <td colspan="6" class="empty">
+            No hay roles registrados.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

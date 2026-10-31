@@ -1,0 +1,113 @@
+<section class="users-list">
+  <div class="section-header">
+    <div>
+      <h2>Usuarios</h2>
+      <p>Administra las cuentas registradas en el sistema.</p>
+    </div>
+
+    <div class="header-actions">
+      <a routerLink="/users" class="admin-tab active">Usuarios</a>
+      
+
+      <a routerLink="/users/new" class="primary admin-main-button">
+        Nuevo usuario
+      </a>
+    </div>
+  </div>
+
+  <div class="state" *ngIf="loading()">Cargando usuarios...</div>
+  <div class="state error" *ngIf="error()">{{ error() }}</div>
+
+  <div class="filters-card" *ngIf="!loading()">
+    <input
+      type="text"
+      placeholder="Buscar por nombre, correo o teléfono..."
+      [ngModel]="searchTerm()"
+      (ngModelChange)="searchTerm.set($any($event)); resetPage()"
+    />
+
+    <select
+      [ngModel]="selectedRole()"
+      (ngModelChange)="selectedRole.set($any($event)); resetPage()"
+    >
+      <option value="">Todos los roles</option>
+      <option *ngFor="let role of rolesDisponibles()" [value]="role">
+        {{ role }}
+      </option>
+    </select>
+  </div>
+
+  <div class="table-card" *ngIf="!loading()">
+    <table>
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Nombre</th>
+          <th>Correo</th>
+          <th>Teléfono</th>
+          <th>Rol</th>
+          <th>Registro</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let user of paginatedUsers()">
+          <td>
+            <strong>{{ user.usuario }}</strong>
+          </td>
+
+          <td>{{ user.nombre }}</td>
+
+          <td>{{ user.email }}</td>
+
+          <td>{{ user.telefonoNumero || '-' }}</td>
+
+          <td>{{ user.roleName || ('Rol #' + user.roleId) }}</td>
+
+          <td>{{ user.fechaRegistro | date: 'short' }}</td>
+
+          <td class="actions">
+            <a [routerLink]="['/users', user.id, 'edit']" class="ghost">
+              Editar
+            </a>
+
+            <button type="button" class="danger" (click)="deleteUser(user)">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="filteredUsers().length === 0">
+          <td colspan="6" class="empty">
+            No hay usuarios registrados.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination" *ngIf="filteredUsers().length > 0">
+      <button
+        type="button"
+        class="ghost"
+        (click)="prevPage()"
+        [disabled]="page() === 1"
+      >
+        Anterior
+      </button>
+
+      <span>
+        Página {{ page() }} de {{ totalPages() }}
+      </span>
+
+      <button
+        type="button"
+        class="ghost"
+        (click)="nextPage()"
+        [disabled]="page() === totalPages()"
+      >
+        Siguiente
+      </button>
+    </div>
+  </div>
+</section>

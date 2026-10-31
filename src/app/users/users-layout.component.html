@@ -1,0 +1,29 @@
+<div class="shell">
+  <header class="shell__header">
+    <div class="brand">
+      <img [src]="logoUrl" alt="Logo de la empresa" />
+      <div>
+        <span class="brand__name">Inicio</span>
+        <span class="brand__tag">Administración</span>
+      </div>
+    </div>
+
+    <div class="shell__actions">
+      <button type="button" class="ghost" (click)="goChat()">
+        Ir al chat
+      </button>
+
+      <span class="user-pill">
+        Hola, {{ user()?.nombre || 'Usuario' }}
+      </span>
+
+      <button type="button" class="ghost" (click)="logout()">
+        Salir
+      </button>
+    </div>
+  </header>
+
+  <main class="shell__content">
+    <router-outlet />
+  </main>
+</div>

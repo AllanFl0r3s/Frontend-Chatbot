@@ -1,0 +1,308 @@
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand profile-trigger" (click)="toggleCompanyProfile()">
+      <div class="logo">
+        <img
+          [src]="companyInfo.imagen || 'assets/Logo-Istmania.png'"
+          alt="Logo Istmania"
+          class="logo-img"
+        >
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">Istmania Chatbot</div>
+        <div class="brand-sub">Toca para ver información</div>
+      </div>
+    </div>
+
+    <button class="logout-btn" type="button" (click)="logout()" title="Cerrar sesión">
+      <span class="material-icons">logout</span>
+    </button>
+  </header>
+
+  <div
+    class="profile-overlay"
+    *ngIf="showCompanyProfile()"
+    (click)="closeCompanyProfile()"
+  >
+    <div class="profile-card" (click)="$event.stopPropagation()">
+      <div class="profile-card-header">
+        <div class="profile-avatar">
+          <img
+            [src]="companyInfo.imagen || 'assets/Logo-Istmania.png'"
+            alt="Logo Istmania"
+            class="profile-logo-img"
+          >
+        </div>
+
+        <div class="profile-main">
+          <div class="profile-name">{{ companyInfo.nombre || 'Istmania' }}</div>
+          <div class="profile-status">Información de la empresa</div>
+
+          <button
+            *ngIf="isAdmin && !isEditingCompanyProfile"
+            class="profile-edit-btn"
+            type="button"
+            (click)="startEditCompanyProfile()"
+          >
+            <span class="material-icons">edit</span>
+            <span>Editar</span>
+          </button>
+        </div>
+
+        <button class="profile-close" type="button" (click)="closeCompanyProfile()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="profile-body">
+        <div class="profile-row">
+          <span class="material-icons">call</span>
+          <div class="profile-content">
+            <div class="profile-label">Teléfono</div>
+
+            <div class="profile-value" *ngIf="!isEditingCompanyProfile">
+              {{ companyInfo.telefono }}
+            </div>
+
+            <input
+              *ngIf="isEditingCompanyProfile"
+              [(ngModel)]="editableCompanyInfo.telefono"
+              class="profile-input"
+              type="text"
+            >
+          </div>
+        </div>
+
+        <div class="profile-row">
+  <span class="material-icons">chat</span>
+
+  <div class="profile-content">
+    <div class="profile-label">WhatsApp</div>
+
+    <div class="profile-value" *ngIf="!isEditingCompanyProfile">
+      <a
+        *ngIf="companyInfo.whatsapp"
+        [href]="whatsappLink"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="whatsapp-link"
+      >
+        {{ companyInfo.whatsapp }}
+      </a>
+
+      <span *ngIf="!companyInfo.whatsapp">
+        No disponible
+      </span>
+    </div>
+
+    <input
+      *ngIf="isEditingCompanyProfile"
+      [(ngModel)]="editableCompanyInfo.whatsapp"
+      class="profile-input"
+      type="text"
+    >
+  </div>
+</div>
+
+        <div class="profile-row">
+          <span class="material-icons">mail</span>
+          <div class="profile-content">
+            <div class="profile-label">Correo</div>
+
+            <div class="profile-value" *ngIf="!isEditingCompanyProfile">
+              {{ companyInfo.correo }}
+            </div>
+
+            <input
+              *ngIf="isEditingCompanyProfile"
+              [(ngModel)]="editableCompanyInfo.correo"
+              class="profile-input"
+              type="email"
+            >
+          </div>
+        </div>
+
+        <div class="profile-row">
+          <span class="material-icons">location_on</span>
+          <div class="profile-content">
+            <div class="profile-label">Dirección 1</div>
+
+            <div class="profile-value" *ngIf="!isEditingCompanyProfile">
+              {{ companyInfo.direccion1 }}
+            </div>
+
+            <input
+              *ngIf="isEditingCompanyProfile"
+              [(ngModel)]="editableCompanyInfo.direccion1"
+              class="profile-input"
+              type="text"
+            >
+          </div>
+        </div>
+
+        <div class="profile-row">
+          <span class="material-icons">location_on</span>
+          <div class="profile-content">
+            <div class="profile-label">Dirección 2</div>
+
+            <div class="profile-value" *ngIf="!isEditingCompanyProfile">
+              {{ companyInfo.direccion2 }}
+            </div>
+
+            <input
+              *ngIf="isEditingCompanyProfile"
+              [(ngModel)]="editableCompanyInfo.direccion2"
+              class="profile-input"
+              type="text"
+            >
+          </div>
+        </div>
+
+        <div class="profile-row">
+          <span class="material-icons">schedule</span>
+          <div class="profile-content">
+            <div class="profile-label">Horario</div>
+
+            <div class="profile-value" *ngIf="!isEditingCompanyProfile">
+              {{ companyInfo.horario }}
+            </div>
+
+            <input
+              *ngIf="isEditingCompanyProfile"
+              [(ngModel)]="editableCompanyInfo.horario"
+              class="profile-input"
+              type="text"
+            >
+          </div>
+        </div>
+
+        <div class="profile-row" *ngIf="isEditingCompanyProfile">
+          <span class="material-icons">image</span>
+          <div class="profile-content">
+            <div class="profile-label">Imagen</div>
+            <input
+              type="file"
+              accept="image/*"
+              (change)="onImageSelected($event)"
+            >
+          </div>
+        </div>
+
+        <div class="profile-actions" *ngIf="isAdmin && isEditingCompanyProfile">
+          <button
+            class="profile-cancel-btn"
+            type="button"
+            (click)="cancelEditCompanyProfile()"
+          >
+            Cancelar
+          </button>
+
+          <button
+            class="profile-save-btn"
+            type="button"
+            (click)="saveCompanyProfile()"
+          >
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="content">
+    <section class="card">
+      <div class="card-header">
+        <div class="card-title">Asistente</div>
+        <div class="card-hint">Respuestas limitadas al dominio del sistema</div>
+      </div>
+
+      <div class="chat" #scrollRef (click)="closeMenu()">
+        <div
+          *ngFor="let m of messages(); let i = index"
+          class="msg"
+          [class.me]="m.from==='user'"
+        >
+          <div class="bubble-wrap">
+            <div
+              class="bubble"
+              [class.bot]="m.from==='bot'"
+              [class.user]="m.from==='user'"
+              (click)="$event.stopPropagation()"
+              (contextmenu)="$event.preventDefault(); toggleMenu(i)"
+              (mousedown)="startPress(i)"
+              (mouseup)="cancelPress()"
+              (mouseleave)="cancelPress()"
+              (touchstart)="startPress(i)"
+              (touchend)="cancelPress()"
+              (touchcancel)="cancelPress()"
+            >
+              <button
+                class="msg-menu-btn"
+                type="button"
+                title="Opciones"
+                (click)="toggleMenu(i); $event.stopPropagation()"
+              >
+                <span class="material-icons">expand_more</span>
+              </button>
+
+              <div class="msg-menu" *ngIf="menuIndex === i">
+                <button
+                  class="msg-menu-item delete"
+                  type="button"
+                  (click)="removeMessage(i); $event.stopPropagation()"
+                >
+                  <span class="material-icons">delete</span>
+                  <span>Eliminar</span>
+                </button>
+              </div>
+
+              <div class="text" [innerHTML]="formatMessage(m.text)"></div>
+              <div class="meta">{{ m.at | date:'shortTime' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="sending()" class="msg">
+          <div class="bubble-wrap">
+            <div class="bubble bot">
+              <span class="typing">
+                <span></span><span></span><span></span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="composer">
+        <div class="error" *ngIf="error()">{{ error() }}</div>
+
+        <div class="composer-row">
+          <textarea
+            #ta
+            [(ngModel)]="input"
+            (input)="autoResize(ta)"
+            (keydown)="onEnter($event)"
+            placeholder="Escribe tu mensaje… (máx 300)"
+            rows="1"
+          ></textarea>
+
+          <button
+            class="primary"
+            type="button"
+            (click)="send()"
+            [disabled]="sending() || !input.trim() || input.length > 300"
+          >
+            Enviar
+          </button>
+        </div>
+
+        <div class="composer-meta">
+          <span class="muted">Enter para enviar • Shift+Enter para salto</span>
+          <span class="counter" [class.over]="input.length > 300">
+            {{ input.length }}/300
+          </span>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

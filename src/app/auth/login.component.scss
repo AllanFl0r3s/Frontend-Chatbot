@@ -1,0 +1,316 @@
+.login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 3rem 1.5rem;
+  position: relative;
+  background: radial-gradient(circle at top, #fff7e9 0%, #f4efe9 45%, #efe7df 100%);
+  overflow: hidden;
+}
+
+.login__frame {
+  position: relative;
+  z-index: 2;
+  width: min(1100px, 100%);
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.login__brand {
+  padding: 3.5rem;
+  background: linear-gradient(135deg, #0f6a6a 0%, #0a4d4d 55%, #083a3a 100%);
+  color: #f8f4ee;
+  position: relative;
+}
+
+.login__brand::before,
+.login__brand::after {
+  content: '';
+  position: absolute;
+  border-radius: 999px;
+  opacity: 0.18;
+}
+
+.login__brand::before {
+  width: 220px;
+  height: 220px;
+  top: -60px;
+  right: -80px;
+  background: radial-gradient(circle, #f4a63b 0%, transparent 65%);
+}
+
+.login__brand::after {
+  width: 280px;
+  height: 280px;
+  bottom: -120px;
+  left: -120px;
+  background: radial-gradient(circle, #9ce1cf 0%, transparent 70%);
+}
+
+.brand-logo {
+  width: 120px;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(4px);
+}
+
+.login__brand h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 2.6vw, 2.8rem);
+  margin: 0 0 1rem;
+  letter-spacing: 0.02em;
+}
+
+.login__brand p {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin: 0 0 2rem;
+}
+
+.brand-metrics {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.brand-metrics div {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.metric-value {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.login__panel {
+  padding: 3.5rem 3.5rem 3rem;
+  background: #faf7f2;
+  display: grid;
+  gap: 2rem;
+}
+
+.panel-header h2 {
+  margin: 0.4rem 0;
+  font-size: 1.75rem;
+}
+
+.panel-header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.login-form {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.field span {
+  font-size: 0.9rem;
+}
+
+.field input {
+  height: 48px;
+  padding: 0 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: #ffffff;
+  font-size: 1rem;
+}
+
+.field input:focus {
+  outline: 2px solid rgba(15, 106, 106, 0.2);
+  border-color: var(--brand);
+}
+
+button {
+  height: 48px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--brand);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(15, 106, 106, 0.2);
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.error {
+  margin: 0;
+  color: #b5472d;
+  font-weight: 500;
+}
+
+.login__glow {
+  position: absolute;
+  inset: 20% 5% auto auto;
+  width: 360px;
+  height: 360px;
+  background: radial-gradient(circle, rgba(244, 166, 59, 0.2), transparent 70%);
+  filter: blur(10px);
+  animation: float 6s ease-in-out infinite;
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* ... mantén tus estilos de .login, .login__frame, etc. ... */
+
+.field {
+  display: grid;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: var(--ink);
+
+  span {
+    font-size: 0.9rem;
+    text-align: left;
+  }
+
+  input {
+    height: 48px;
+    padding: 0 1rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
+    background: #ffffff;
+    font-size: 1rem;
+    width: 100%; // Asegura que ocupen todo el ancho
+    box-sizing: border-box;
+
+    &:focus {
+      outline: 2px solid rgba(15, 106, 106, 0.2);
+      border-color: var(--brand);
+    }
+  }
+}
+
+/* Contenedor específico para el input de password y el ojo */
+.password-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  input {
+    padding-right: 48px; // Espacio extra para que el texto no choque con el icono
+  }
+
+  .eye-button {
+    position: absolute;
+    right: 4px; // Ajustado para que quede centrado en el borde derecho
+    height: 40px;
+    width: 40px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    transition: none; // Evita el salto del botón principal
+    
+    &:hover {
+      transform: none; // Evita que el ojo "flote" como el botón de Entrar
+      box-shadow: none;
+    }
+
+    .eye-icon {
+      width: 22px;
+      height: 22px;
+      fill: #6b7280;
+      transition: fill 0.2s ease;
+    }
+
+    &:hover .eye-icon {
+      fill: var(--brand); // Cambia al color de tu marca al pasar el mouse
+    }
+  }
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.toggle-btn {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@media (max-width: 900px) {
+  .login__frame {
+    grid-template-columns: 1fr;
+  }
+
+  .login__brand {
+    padding: 2.5rem;
+  }
+
+  .login__panel {
+    padding: 2.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .brand-metrics {
+    gap: 1.5rem;
+  }
+}

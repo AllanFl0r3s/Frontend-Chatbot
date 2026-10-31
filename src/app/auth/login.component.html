@@ -1,0 +1,67 @@
+<section class="login">
+  <div class="login__frame">
+    <div class="login__brand">
+      <div class="brand-logo">
+        <img [src]="logoUrl" alt="Logo de la empresa" />
+      </div>
+      <h1>Bienvenido</h1>
+    </div>
+
+    <div class="login__panel">
+      <div class="panel-header">
+        <span class="eyebrow">Acceso</span>
+        <h2>Iniciar sesión</h2>
+        <p>Usa tu usuario o correo y contraseña registrados.</p>
+      </div>
+
+      <form class="login-form" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="field">
+          <span>Usuario o correo</span>
+          <input
+            type="text"
+            formControlName="identifier"
+            placeholder="Usuario o correo"
+            autocomplete="username"
+          />
+        </label>
+
+        <label class="field">
+          <span>Contraseña</span>
+          <div class="password-container">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+            />
+
+            <button
+              type="button"
+              class="eye-button"
+              (click)="showPassword = !showPassword"
+              aria-label="Mostrar contraseña"
+            >
+              <svg *ngIf="!showPassword" viewBox="0 0 24 24" class="eye-icon">
+                <path d="M12 5C6 5 2 12 2 12s4 7 10 7 10-7 10-7-4-7-10-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
+              </svg>
+
+              <svg *ngIf="showPassword" viewBox="0 0 24 24" class="eye-icon">
+                <path d="M3 2 2 3l4 4C3.6 9 2 12 2 12s4 7 10 7c2.2 0 4.2-.7 6-2l4 4 1-1L3 2Zm9 15c-3.5 0-6.5-3.5-7.7-5C5.5 10.5 8.5 7 12 7c1 0 2 .3 2.8.8l-1.5 1.5A4 4 0 0 0 12 9a4 4 0 0 0-4 4c0 .5.1 1 .3 1.5l-1.4 1.4C8.2 16.5 10 17 12 17Z" />
+              </svg>
+            </button>
+          </div>
+        </label>
+
+        <button type="submit" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Ingresando...' : 'Entrar' }}
+        </button>
+
+        <p class="error" *ngIf="errorMessage" role="alert">
+          {{ errorMessage }}
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <div class="login__glow"></div>
+</section>
