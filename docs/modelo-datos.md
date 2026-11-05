@@ -201,9 +201,9 @@ Para CHATBOT se conserva inicialmente el CASCADE sesión-mensajes ya existente. 
 2. **Completado en SSMS:** registro dbo.__AcademicMigrations y repetición de la versión 001 comprobados en la base temporal. El ejecutor PowerShell sigue pendiente de prueba contra el motor.
 3. **Completado:** migración 001 aplicada en DW_ISTMA para Clientes, Rutas, ClienteRuta, Visitas, Categorias, Productos, Bodegas y Existencias. La ampliación del resto del modelo sigue pendiente.
 4. **Completado:** database/seeds/001_datos_academicos.sql, con fecha fija y registro transaccional de carga; database/tests/002_semilla.sql verifica los resultados después de repetirlo.
-5. **Implementado para importar:** pantalla /visits y adaptador académico del backend complementario, documentados en docs/flujo-visitas.md. Compilación, pruebas de servicio y SQL correctas; completar prueba manual HTTP/SQL desde la terminal habitual después de importar ambos cambios.
+5. **Comprobado localmente:** pantalla /visits y adaptador académico del backend incorporados. Compilación, pruebas de servicio y SQL correctas; el autor confirmó login y consulta desde la interfaz. La suite HTTP automática sigue bloqueada en la terminal restringida. Ver docs/bitacora/semana-3.md.
 6. Preparar backend y base accesibles desde el despliegue público por HTTPS. La instancia SQL de una PC y la vista estática actual de Vercel no resuelven esta entrega.
-7. Registrar resultados reales en docs/bitacora/semana-3.md; crear release semana-3 solo cuando corresponda al estado entregado.
+7. **Bitácora registrada:** docs/bitacora/semana-3.md. Publicación completa y release semana-3 siguen pendientes.
 
 Las nuevas migraciones académicas y su guía están en database/ de este mismo repositorio, para que el evaluador pueda revisarlas. Los scripts originales de instalación y el servicio de ejecución siguen en el backend hermano. La guía explica el requisito de la base local marcada y cómo preparar una base temporal de prueba. El script semilla está en database/seeds/ y su comprobación en database/tests/.
 

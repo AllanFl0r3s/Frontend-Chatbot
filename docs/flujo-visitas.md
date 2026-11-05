@@ -75,10 +75,9 @@ requiere pulsar Consultar para iniciar una nueva búsqueda.
 
 Las 5 pruebas HTTP existentes no pudieron completarse: la terminal restringida
 denegó conexiones locales con EACCES. El intento TypeORM directo también quedó
-bloqueado (ESOCKET). La prueba de interfaz con el backend ejecutándose en la terminal
-habitual sigue pendiente; no se presenta como verificado todo el recorrido HTTP/SQL.
+bloqueado (ESOCKET). El autor confirmó posteriormente el inicio de sesión, el acceso a Visitas y resultados visibles desde las aplicaciones iniciadas en sus terminales habituales. Esto confirma el recorrido manual local, sin dar por aprobada la suite HTTP bloqueada. Ver [bitácora semana 3](bitacora/semana-3.md).
 
 No se recompiló ni publicó esta versión en Vercel. Su vista previa sigue sin backend
-público ni login habilitado. Publicar backend/base, completar la prueba del flujo y
+público ni login habilitado. Publicar backend/base, probar el flujo en producción y
 preparar la entrega semana-3 son trabajos pendientes; llegar a 15 commits por sí
 solo no completa esos requisitos.
