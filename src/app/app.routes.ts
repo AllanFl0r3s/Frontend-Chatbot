@@ -56,6 +56,11 @@ export const routes: Routes = [
 
   // RUTA ROLES
 
-  // SIEMPRE AL FINAL
-  { path: '**', redirectTo: 'login' },
+  // Siempre al final: solo captura direcciones que no coinciden con las rutas anteriores.
+  {
+    path: '**',
+    title: 'Página no encontrada | Chatbot',
+    loadComponent: () =>
+      import('./not-found/not-found.component').then((m) => m.NotFoundComponent),
+  },
 ];
