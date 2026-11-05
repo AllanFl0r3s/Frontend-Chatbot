@@ -314,3 +314,15 @@ button:disabled {
     gap: 1.5rem;
   }
 }
+
+// Aviso visible solo en la compilación de demostración para Vercel.
+.preview-notice {
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #b8dcd6;
+  border-radius: 12px;
+  background: #edf8f5;
+  color: #20564d;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}

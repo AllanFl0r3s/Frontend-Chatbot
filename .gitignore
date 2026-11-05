@@ -49,3 +49,6 @@ Thumbs.db
 *.pem
 *.key
 *.tsbuildinfo
+
+# Metadatos locales del despliegue
+/.vercel

@@ -3,6 +3,7 @@ import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../core/auth.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -17,6 +18,9 @@ export class LoginComponent {
   private readonly fb = inject(FormBuilder);
   private readonly cdr = inject(ChangeDetectorRef);
 
+  // Solo la compilación de Vercel usa este modo; el login local sigue habilitado.
+  readonly isVisualPreview = environment.visualPreview;
+
   readonly logoUrl = '/assets/LOGO-WEB-IST.webp';
 
   readonly form = this.fb.nonNullable.group({
@@ -28,7 +32,13 @@ export class LoginComponent {
   isSubmitting = false;
   showPassword = false;
 
+  constructor() {
+    if (this.isVisualPreview) this.form.disable();
+  }
+
   submit() {
+    // La vista pública no recibe contraseñas ni intenta llamar a localhost.
+    if (this.isVisualPreview) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.cdr.detectChanges();

@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:MANDAFRONT": "node dist/MANDAFRONT/server/server.mjs"
+    "serve:ssr:MANDAFRONT": "node dist/MANDAFRONT/server/server.mjs",
+    "build:preview": "ng build --configuration preview"
   },
   "prettier": {
     "printWidth": 100,

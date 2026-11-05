@@ -14,6 +14,10 @@
         <p>Usa tu usuario o correo y contraseña registrados.</p>
       </div>
 
+      <p class="preview-notice" role="status" *ngIf="isVisualPreview">
+        Vista previa de la interfaz. El inicio de sesión se prueba en el entorno local.
+      </p>
+
       <form class="login-form" [formGroup]="form" (ngSubmit)="submit()">
         <label class="field">
           <span>Usuario o correo</span>
@@ -52,7 +56,7 @@
           </div>
         </label>
 
-        <button type="submit" [disabled]="isSubmitting">
+        <button type="submit" [disabled]="isSubmitting || isVisualPreview">
           {{ isSubmitting ? 'Ingresando...' : 'Entrar' }}
         </button>
 

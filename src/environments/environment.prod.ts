@@ -1,4 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:3020',
+  // Backend de demostración conectado a las bases locales de SQLEXPRESS.
+  visualPreview: false,
+  apiUrl: 'http://localhost:3021',
 };
