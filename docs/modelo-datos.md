@@ -13,7 +13,7 @@ El producto permite consultar información comercial mediante el chatbot y admin
 | Publicado en Vercel | Vista previa de la interfaz, con login deshabilitado. No es aún el flujo central conectado a una base pública. |
 | Propuesto en este documento | Modelo comercial completo, relaciones y restricciones pendientes de migraciones e integración. |
 
-**La entrega de semana 3 sigue pendiente:** las 8 tablas actuales no son 8 tablas de negocio; incluyen infraestructura de usuarios y chat. Tampoco existen todavía migraciones incrementales separadas de los datos semilla. Los scripts actuales crean bases nuevas y se detienen si ya existen: no deben ejecutarse otra vez para actualizar una base.
+**La entrega de semana 3 sigue pendiente:** las 8 tablas originales no son 8 tablas de negocio; incluyen infraestructura de usuarios y chat. Ahora está preparada la migración versionada 001 con ocho tablas comerciales, separada de los datos semilla. Su aplicación en SQL y sus pruebas de restricciones siguen pendientes. Los scripts originales crean bases nuevas y se detienen si ya existen: no deben ejecutarse otra vez para actualizar una base.
 
 Fuentes revisadas: `database/local/01_crear_CHATBOT_local.sql`, `database/local/02_crear_DW_ISTMA_local_visitas.sql`, entidades y README del repositorio hermano `ChatbotBackendLocal`. Los nombres y restricciones empresariales que no conocemos no se dan por confirmados.
 
@@ -96,6 +96,8 @@ PasswordHash almacena bcrypt, nunca la contraseña en texto. No se devuelve al f
 `Fecha` y `Hora` son texto por compatibilidad con la consulta heredada. El endpoint convierte Fecha mediante TRY_CAST, filtra ruta/fecha y agrupa por código de cliente. Dos registros del mismo cliente no equivalen necesariamente a dos visitas completadas. `CodigoRevision` y `EnRuta` no demuestran una venta.
 
 ## 4. Diseño objetivo del producto completo — pendiente
+
+**Avance de migraciones:** `database/migrations/001_crear_esquema_comercial.sql` crea las primeras ocho tablas de este diseño. Está preparada y comprobada sintácticamente, pero aún no aplicada a la base de desarrollo. Consulta [la guía de ejecución](../database/README.md). El resto de las tablas y la integración con los endpoints permanecen pendientes.
 
 Se conservan las 5 tablas internas de CHATBOT. En DW_ISTMA se propone un esquema `academico` con 22 tablas comerciales propias. Los objetos `demo` y `paco` actuales siguen siendo fuentes de compatibilidad; no se renombrarán ni eliminarán automáticamente.
 
@@ -196,13 +198,13 @@ Para CHATBOT se conserva inicialmente el CASCADE sesión-mensajes ya existente. 
 ## 5. Próximos pasos, en entregas pequeñas
 
 1. **Este avance:** revisar y versionar el modelo, sin ejecutar cambios en SQL.
-2. Crear un ejecutor y registro de migraciones del entorno académico. Cada versión debe aplicarse una sola vez y fallar sin dejar cambios parciales.
-3. Crear las primeras 8 tablas comerciales coherentes: Clientes, Rutas, ClienteRuta, Visitas, Categorias, Productos, Bodegas y Existencias. Esto es una meta pendiente; luego se ampliará el resto del modelo según las historias.
+2. Ejecutar y comprobar el nuevo ejecutor database/Invoke-Migrations.ps1 y el registro dbo.__AcademicMigrations en una base temporal. La versión 001 usa una transacción y un bloqueo para evitar ejecuciones parciales o simultáneas.
+3. Aplicar la migración 001 revisada para crear Clientes, Rutas, ClienteRuta, Visitas, Categorias, Productos, Bodegas y Existencias. Luego se ampliará el resto del modelo según las historias.
 4. Separar el script semilla de las migraciones: datos ficticios reproducibles, casos válidos y casos para probar errores; sin duplicados al repetirlo.
 5. Conectar una consulta completa desde el frontend al backend y a las tablas académicas. Probar permisos, filtros, resultados vacíos y errores.
 6. Preparar backend y base accesibles desde el despliegue público por HTTPS. La instancia SQL de una PC y la vista estática actual de Vercel no resuelven esta entrega.
 7. Registrar resultados reales en docs/bitacora/semana-3.md; crear release semana-3 solo cuando corresponda al estado entregado.
 
-Los SQL y la ejecución viven en el backend; este documento está en el frontend que se entrega al curso. Antes de la entrega se deberá acordar cómo incluir las migraciones y semillas en el repositorio que evalúa la plataforma, para que sean visibles y reproducibles. No basta enlazar archivos que solo existen en otra computadora.
+Las nuevas migraciones académicas y su guía están en database/ de este mismo repositorio, para que el evaluador pueda revisarlas. Los scripts originales de instalación y el servicio de ejecución siguen en el backend hermano. La guía explica el requisito de la base local marcada y cómo preparar una base temporal de prueba. El script semilla de las tablas nuevas todavía está pendiente.
 
 La exigencia es **15 commits en total**, con al menos 3 en los últimos 10 días. Cada commit debe representar trabajo comprobable. Mantener en README el token académico requerido, que es distinto de cualquier contraseña o clave de API.
