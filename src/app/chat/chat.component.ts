@@ -9,7 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ChatApiService } from './chat-api.service';
 
 type Msg = { from: 'user' | 'bot'; text: string; at: Date };
@@ -17,7 +17,7 @@ type Msg = { from: 'user' | 'bot'; text: string; at: Date };
 @Component({
   standalone: true,
   selector: 'app-chat',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css'],
 })

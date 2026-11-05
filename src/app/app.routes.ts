@@ -21,6 +21,14 @@ export const routes: Routes = [
       import('./chat/chat.component').then((m) => m.ChatComponent),
   },
 
+  // Consulta estructurada: usa el mismo JWT que el chat; el backend valida el acceso a rutas.
+  {
+    path: 'visits',
+    canActivate: [authGuard],
+    title: 'Consulta de visitas | Chatbot',
+    loadComponent: () => import('./visits/visits.component').then((m) => m.VisitsComponent),
+  },
+
   // Administración de usuarios
   {
     path: 'users',

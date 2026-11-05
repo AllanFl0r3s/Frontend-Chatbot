@@ -33,6 +33,6 @@ La fecha de datos es fija: 2026-11-05 en Honduras; las visitas se guardan en UTC
 ## Límites de esta comprobación
 
 - Se probó SQL desde SSMS; el ejecutor PowerShell aún no tiene prueba contra el motor desde la terminal restringida.
-- La semilla alimenta academico.*, pero el backend sigue leyendo las fuentes heredadas hasta implementar el adaptador.
+- Se agregó un adaptador académico en el cambio complementario del backend y una pantalla /visits en este frontend. Hay que importar ambos para usarlos; la comprobación completa HTTP/SQL desde la interfaz sigue pendiente. Consulta docs/flujo-visitas.md.
 - No se comprobó todavía el flujo central contra estas tablas desde el frontend ni en un dominio público.
 - La base temporal se conserva para revisión. El despliegue y la bitácora completa de semana 3 siguen pendientes.

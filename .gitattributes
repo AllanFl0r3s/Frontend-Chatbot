@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Los parches conservan los espacios de contexto y la firma de git format-patch.
+integraciones/*.patch text eol=lf -whitespace

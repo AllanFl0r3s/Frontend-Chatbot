@@ -1,0 +1,352 @@
+From 7f16ae05f162562952240cc96b857c0ae97e4832 Mon Sep 17 00:00:00 2001
+From: AllanFl0r3s <Allan_Flores07@outlook.com>
+Date: Thu, 5 Nov 2026 14:36:13 -0600
+Subject: [PATCH] feat: consultar visitas desde el esquema academico local
+
+---
+ .env.example                       |  5 ++
+ README.md                          | 10 ++-
+ docs/visitas.md                    | 97 +++++++++++++++++++++---------
+ src/visits/visits.academic.spec.ts | 55 +++++++++++++++++
+ src/visits/visits.controller.ts    |  2 +-
+ src/visits/visits.core.ts          | 36 ++++++++++-
+ src/visits/visits.service.ts       | 10 ++-
+ src/visits/visits.spec.ts          |  2 +-
+ 8 files changed, 180 insertions(+), 37 deletions(-)
+ create mode 100644 src/visits/visits.academic.spec.ts
+
+diff --git a/.env.example b/.env.example
+index 985caf5..c730528 100644
+--- a/.env.example
++++ b/.env.example
+@@ -34,3 +34,8 @@ OPENAI_CHAT_MODEL=gpt-4.1-mini
+ 
+ # Usuario de demostración admin.local, ID 1; no representa permisos de producción.
+ VISITS_ROUTE_ACCESS='{"1":["S08","S09"]}'
++
++# academic consulta academico.Visitas (semilla 2026-11-05); es el valor por defecto.
++# legacy consulta paco.APP_RV y conserva sus fechas/datos originales.
++# Una configuración inválida produce 503, sin cambiar silenciosamente de fuente.
++VISITS_DATA_SOURCE=academic
+diff --git a/README.md b/README.md
+index cafa94c..f693c68 100644
+--- a/README.md
++++ b/README.md
+@@ -9,7 +9,7 @@ se encuentra en [docs/backend-original.md](docs/backend-original.md).
+ - Dos bases locales: CHATBOT para usuarios, roles, sesiones, mensajes y perfil;
+   DW_ISTMA para clientes, programación y registros ficticios de visitas.
+ - Login JWT con el usuario de demostración.
+-- GET /visits/clients: consulta por ruta y fecha, clientes distintos, registros y paginación.
++- GET /visits/clients: consulta las tablas academico por ruta y fecha de Honduras; conserva clientes distintos, registros y paginación. VISITS_DATA_SOURCE=legacy permite usar la fuente anterior explícitamente.
+ - Los datos de ejemplo de S08 tienen 9 clientes y 13 registros en su fecha de creación.
+ 
+ Todavía no se han recreado las fuentes locales de stock, ventas, proyecciones,
+@@ -120,3 +120,11 @@ Validación local del 02/11/2026: compilación correcta y 15 pruebas automatizad
+ aprobadas. Se inició temporalmente el backend en 3021 contra ambas bases locales:
+ login correcto, visitas S08 con HTTP 200 (9 clientes/13 registros con códigos DEMO),
+ ruta sin asignación con HTTP 403 y solicitud sin token con HTTP 401.
++
++## Integración académica de visitas (5 de noviembre de 2026)
++
++La fuente predeterminada ahora es academico.Visitas. Requiere la migración y semilla
++versionadas en database del repositorio Frontend-Chatbot. Fecha de la semilla:
++2026-11-05. La pantalla del frontend está en /visits. Configuración, resultados de
++pruebas y limitaciones: [docs/visitas.md](docs/visitas.md). Las funciones heredadas
++de inventario y otras consultas del chat todavía no se adaptaron a las tablas nuevas.
+diff --git a/docs/visitas.md b/docs/visitas.md
+index 9d306d8..d1c6871 100644
+--- a/docs/visitas.md
++++ b/docs/visitas.md
+@@ -1,40 +1,77 @@
+-# Consulta de clientes con registros de visita
++# Clientes con registros de visita: entorno académico
+ 
+-GET /visits/clients?route=S08&date=2026-11-02&page=1&pageSize=50
++GET /visits/clients?route=S08&date=2026-11-05&page=1&pageSize=5
+ 
+-Requiere el JWT existente de la aplicación. Lee paco.APP_RV mediante
+-prodConnection, configurada con PROD_DB_* o las variables legacy DB_*2.
+-La conexión empresarial requiere red interna o VPN.
++Esta copia académica usa por defecto academico.Visitas, academico.Clientes y
++academico.Rutas en DW_ISTMA local, mediante prodConnection. El nombre heredado
++prodConnection no implica que se esté conectando a la empresa: el destino lo
++establece PROD_DB_HOST=127.0.0.1, puerto 14330, base DW_ISTMA.
+ 
+-La ruta se autoriza mediante una asignación explícita del lado del servidor:
++## Requisitos de datos
+ 
+-```dotenv
+-VISITS_ROUTE_ACCESS='{"12":["S08"]}'
+-```
++Aplicar migración 001 y semilla 001 del directorio database del repositorio
++Frontend-Chatbot. Ambas ya se ejecutaron y comprobaron localmente el 5 de noviembre.
++No volver a crear las bases ni copiar datos empresariales para probar esta consulta.
+ 
+-12 es un ID_USUARIO ficticio de ejemplo, no una cuenta de SQL. Solo se deben
+-asignar rutas autorizadas. El valor por defecto {} deniega todas las rutas.
+-La identidad y permisos de PACO deberán definirse antes de integrar ese sistema.
++La configuración del backend admite dos fuentes explícitas:
+ 
+-La respuesta incluye clientes distintos, registros por cliente, totales,
+-paginación y queriedAt (instante de consulta, no sincronización de la fuente).
+-No interpreta CodigoRevision ni EnRuta y no acredita venta o visita completada.
+-Se excluyen códigos de cliente vacíos. Una falla SQL responde 503, no cero visitas.
++- VISITS_DATA_SOURCE=academic: tablas nuevas, fecha fija de la semilla 2026-11-05.
++  Es el valor por defecto si la variable no está definida.
++- VISITS_DATA_SOURCE=legacy: paco.APP_RV y sus datos/fechas originales. Este modo no
++  copia ni convierte registros al esquema nuevo.
++- Cualquier otro valor produce 503. No hay fallback silencioso entre fuentes.
+ 
+-Se usa TRY_CAST y ROW_NUMBER por compatibilidad 100 de DW_ISTMA. La consulta
+-recibe parámetros separados del SQL y no modifica tablas ni vistas.
+-La conversión de fechas de texto puede requerir recorrer muchos registros;
+-conviene medir el rendimiento con la carga empresarial antes de ampliar el uso.
++La selección depende solo de la configuración del servidor, nunca de una URL.
++No requiere OpenAI. .env.example documenta los valores; no sobrescribir un .env
++existente ni publicar sus secretos.
+ 
+-Validación:
++## Autorización y contrato
+ 
+-```powershell
+-npm run build
+-npm test -- --runInBand visits.spec.ts
+-node --experimental-strip-types --test test/visits.core.test.cjs
+-```
++Se requiere el JWT de la aplicación. La identidad viene del token validado y
++VISITS_ROUTE_ACCESS define las rutas asignadas en el servidor. Para admin.local,
++ID 1 en la base de demostración, el ejemplo local asigna S08 y S09. Tener rol de
++administrador no omite este control. Sin asignación, responde 403.
+ 
+-La última prueba requiere Node.js 22.18 o superior. Las pruebas automatizadas
+-simulan SQL. En la validación manual con datos empresariales, la ruta S08 del
+-2026-11-02 devolvió HTTP 200, 9 clientes y 13 registros, coincidiendo con SSMS.
+-Los resultados pueden cambiar cuando se actualiza la fuente.
++La respuesta conserva route, date, totalClients, totalVisitRecords, clients,
++pagination, queriedAt y description. Los clientes incluyen clientCode y
++visitRecords. Una página fuera de rango conserva los totales y devuelve clients
++vacío. Una fecha sin visitas devuelve cero; un fallo SQL devuelve 503.
++
++FechaHora de academico.Visitas es UTC. date representa el día de Honduras UTC-6.
++Por eso la consulta convierte la fecha antes de filtrar; no confunde visitas de
++las 00:00 locales con registros de la tarde del día anterior. La conversión por
++fila es apropiada para esta demostración pequeña; medir su costo antes de usarla
++con un volumen mayor y considerar límites UTC sobre el índice para esa evolución.
++No se une ClienteRuta al contar: múltiples asignaciones no multiplican visitas.
++
++No se interpreta CodigoRevision ni EnRuta como venta o visita completada. Tampoco
++se filtran clientes históricos por su estado actual: los registros se conservan.
++
++## Prueba manual
++
++1. Iniciar este backend en 3021 y el frontend local en 4200.
++2. Iniciar sesión con la cuenta de demostración y abrir Visitas desde el chat o
++   administración. También se puede probar GET /visits/clients en Swagger.
++3. S08, 2026-11-05, pageSize=5: 9 clientes, 13 registros y dos páginas (5 y 4).
++4. S09 el mismo día: 3 clientes y 3 registros.
++5. S08, 2026-11-03: lista y totales vacíos.
++6. Ruta sin asignación: 403. Sin JWT o con token vencido: 401.
++
++## Validación realizada el 5 de noviembre de 2026
++
++- npm run build: correcto.
++- npm test -- --runInBand visits.academic.spec.ts: 7 pruebas correctas, sin puertos.
++- node --test test/visits.core.test.cjs: 10 pruebas correctas.
++- SQL exacto del adaptador ejecutado en SSMS contra DW_ISTMA: pasaron paginación
++  de 5/4 clientes, aislamiento S09, fecha sin visitas y página fuera de rango.
++- Prueba temporal con cuatro registros al borde de medianoche: incluye desde
++  06:00 UTC hasta antes de 06:00 UTC del día siguiente; se revirtieron sus filas.
++
++Las cinco pruebas HTTP de visits.spec.ts se intentaron pero fallaron por
++connect EACCES de la terminal restringida. La conexión TypeORM desde esa terminal
++también quedó bloqueada (ESOCKET). No se presenta como verificado el recorrido
++navegador -> HTTP -> SQL. Ejecutar las pruebas HTTP desde la terminal habitual y
++completar la prueba manual después de importar el cambio.
++
++No se cambió el backend empresarial ni se hicieron escrituras de negocio desde
++este endpoint. La URL pública de Vercel sigue siendo una vista previa de interfaz.
+\ No newline at end of file
+diff --git a/src/visits/visits.academic.spec.ts b/src/visits/visits.academic.spec.ts
+new file mode 100644
+index 0000000..fcde7d7
+--- /dev/null
++++ b/src/visits/visits.academic.spec.ts
+@@ -0,0 +1,55 @@
++import { BadRequestException, ForbiddenException, ServiceUnavailableException } from '@nestjs/common';
++import { ConfigService } from '@nestjs/config';
++import type { DataSource } from 'typeorm';
++import { VisitsService } from './visits.service';
++import { ACADEMIC_VISITED_CLIENTS_SQL, VISITED_CLIENTS_SQL } from './visits.core';
++
++// Se prueba el servicio sin abrir puertos ni conectarse a bases empresariales.
++describe('Visitas académicas: selección de fuente y permisos', () => {
++  const sql = { query: jest.fn() };
++  const query = { route: ' s08 ', date: '2026-11-05', pageSize: '5' };
++  const createService = (source?: string) => new VisitsService(
++    sql as unknown as DataSource,
++    new ConfigService({ VISITS_ROUTE_ACCESS: '{"1":["S08"]}', VISITS_DATA_SOURCE: source }),
++  );
++  beforeEach(() => sql.query.mockReset());
++
++  it('usa academico por defecto con parámetros y conserva el contrato', async () => {
++    sql.query.mockResolvedValue([{ TotalClients: 9, TotalVisitRecords: 13, ClientCode: 'DEMO001', VisitRecords: 2 }]);
++    const response = await createService().listClients(1, query);
++    expect(sql.query).toHaveBeenCalledWith(ACADEMIC_VISITED_CLIENTS_SQL, ['S08','2026-11-05',0,5]);
++    expect(response).toMatchObject({ route: 'S08', date: '2026-11-05', totalClients: 9,
++      totalVisitRecords: 13, clients: [{clientCode: 'DEMO001',visitRecords: 2}],
++      pagination: {page: 1, pageSize: 5, totalPages: 2, hasNextPage: true} });
++  });
++  it('mantiene la fuente anterior únicamente cuando se pide legacy en configuración', async () => {
++    sql.query.mockResolvedValue([{TotalClients:0,TotalVisitRecords:0,ClientCode:null,VisitRecords:null}]);
++    await createService('legacy').listClients(1, query);
++    expect(sql.query).toHaveBeenCalledWith(VISITED_CLIENTS_SQL, ['S08','2026-11-05',0,5]);
++  });
++  it('falla sin consultar ni cambiar de fuente si la configuración es inválida', async () => {
++    await expect(createService('otra-tabla').listClients(1, query)).rejects.toBeInstanceOf(ServiceUnavailableException);
++    expect(sql.query).not.toHaveBeenCalled();
++  });
++  it('rechaza usuarios sin ruta asignada antes de acceder a SQL', async () => {
++    await expect(createService().listClients(2, query)).rejects.toBeInstanceOf(ForbiddenException);
++    await expect(createService().listClients(1, {...query,route:'S09'})).rejects.toBeInstanceOf(ForbiddenException);
++    expect(sql.query).not.toHaveBeenCalled();
++  });
++  it('rechaza fechas imposibles antes de acceder a SQL', async () => {
++    await expect(createService().listClients(1, {...query,date:'2026-02-30'})).rejects.toBeInstanceOf(BadRequestException);
++    expect(sql.query).not.toHaveBeenCalled();
++  });
++  it('distingue una fecha sin visitas de un error de base de datos', async () => {
++    sql.query.mockResolvedValueOnce([{TotalClients:0,TotalVisitRecords:0,ClientCode:null,VisitRecords:null}]);
++    expect(await createService().listClients(1, query)).toMatchObject({totalClients:0,totalVisitRecords:0,clients:[]});
++    sql.query.mockRejectedValueOnce(new Error('private-server-details'));
++    await expect(createService().listClients(1, query)).rejects.toThrow('No fue posible consultar las visitas.');
++  });
++  it('conserva totales al pedir una página fuera del resultado', async () => {
++    sql.query.mockResolvedValue([{TotalClients:9,TotalVisitRecords:13,ClientCode:null,VisitRecords:null}]);
++    const response = await createService().listClients(1, {...query,page:'3'});
++    expect(response).toMatchObject({totalClients:9,clients:[],pagination:{page:3,totalPages:2,hasNextPage:false}});
++    expect(sql.query).toHaveBeenCalledWith(ACADEMIC_VISITED_CLIENTS_SQL, ['S08','2026-11-05',10,15]);
++  });
++});
+diff --git a/src/visits/visits.controller.ts b/src/visits/visits.controller.ts
+index 31dbf1b..5508977 100644
+--- a/src/visits/visits.controller.ts
++++ b/src/visits/visits.controller.ts
+@@ -14,7 +14,7 @@ export class VisitsController {
+   @Get('clients')
+   @ApiOperation({ summary: 'Clientes con registros de visita por ruta y fecha' })
+   @ApiQuery({ name: 'route', required: true, example: 'S08' })
+-  @ApiQuery({ name: 'date', required: true, example: '2026-11-02' })
++  @ApiQuery({ name: 'date', required: true, example: '2026-11-05', description: 'Fecha local de Honduras, AAAA-MM-DD' })
+   @ApiQuery({ name: 'page', required: false, example: 1 })
+   @ApiQuery({ name: 'pageSize', required: false, example: 50 })
+   listClients(@Req() req: any, @Query() query: Record<string, unknown>) {
+diff --git a/src/visits/visits.core.ts b/src/visits/visits.core.ts
+index 7bdea78..8e7243f 100644
+--- a/src/visits/visits.core.ts
++++ b/src/visits/visits.core.ts
+@@ -92,6 +92,40 @@ LEFT JOIN Numbered AS n
+ ORDER BY n.RowNumber;
+ `;
+ 
++// Fuente propia de la demostración. No se une ClienteRuta porque sus períodos
++// podrían multiplicar visitas: cada registro pertenece a un cliente y una ruta.
++// FechaHora es UTC; la fecha pedida por el usuario es la de Honduras (UTC-6).
++export const ACADEMIC_VISITED_CLIENTS_SQL = `
++WITH Clients AS (
++  SELECT c.Codigo AS ClientCode, COUNT(*) AS VisitRecords
++  FROM [academico].[Visitas] AS v
++  INNER JOIN [academico].[Clientes] AS c ON c.Id = v.ClienteId
++  INNER JOIN [academico].[Rutas] AS r ON r.Id = v.RutaId
++  WHERE r.Codigo = @0
++    AND CONVERT(date, DATEADD(hour, -6, v.FechaHora)) = CAST(@1 AS date)
++  GROUP BY c.Codigo
++), Numbered AS (
++  SELECT ClientCode, VisitRecords,
++    ROW_NUMBER() OVER (ORDER BY ClientCode) AS RowNumber
++  FROM Clients
++), Totals AS (
++  SELECT COUNT(*) AS TotalClients,
++    COALESCE(SUM(VisitRecords), 0) AS TotalVisitRecords
++  FROM Clients
++)
++SELECT t.TotalClients, t.TotalVisitRecords, n.ClientCode, n.VisitRecords
++FROM Totals AS t
++LEFT JOIN Numbered AS n ON n.RowNumber > @2 AND n.RowNumber <= @3
++ORDER BY n.RowNumber;
++`;
++
++export function visitedClientsSql(source: string = 'academic'): string {
++  // Lista cerrada de consultas: la URL nunca decide una tabla ni envía SQL.
++  if (source === 'academic') return ACADEMIC_VISITED_CLIENTS_SQL;
++  if (source === 'legacy') return VISITED_CLIENTS_SQL;
++  throw new VisitsConfigurationError('VISITS_DATA_SOURCE debe ser academic o legacy.');
++}
++
+ export function visitsSqlParameters(query: VisitsQuery): [string, string, number, number] {
+   const offset = (query.page - 1) * query.pageSize;
+   return [query.route, query.date, offset, offset + query.pageSize];
+@@ -117,7 +151,7 @@ export function buildVisitsResponse(query: VisitsQuery, rows: VisitsDbRow[], que
+       totalPages: Math.ceil(totalClients / query.pageSize),
+       hasNextPage: query.page * query.pageSize < totalClients,
+     },
+-    // Este instante es de consulta; no conocemos la fecha de sincronización de APP_RV.
++    // Este instante es de consulta, no una fecha de sincronización de los datos.
+     queriedAt,
+     description: 'Clientes con registros de visita. No acredita venta ni visita completada.',
+   };
+diff --git a/src/visits/visits.service.ts b/src/visits/visits.service.ts
+index f4ba17e..d815d1e 100644
+--- a/src/visits/visits.service.ts
++++ b/src/visits/visits.service.ts
+@@ -6,7 +6,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
+ import { DataSource } from 'typeorm';
+ import {
+   authorizeVisitsRoute, buildVisitsResponse, parseVisitsQuery,
+-  VISITED_CLIENTS_SQL, visitsSqlParameters, VisitsAccessError, VisitsInputError,
++  visitedClientsSql, visitsSqlParameters, VisitsAccessError, VisitsInputError,
+ } from './visits.core';
+ import type { VisitsDbRow } from './visits.core';
+ 
+@@ -23,20 +23,24 @@ export class VisitsService {
+ 
+   async listClients(userId: number, rawQuery: Record<string, unknown>) {
+     let query: ReturnType<typeof parseVisitsQuery>;
++    let sql: string;
+     try {
+       query = parseVisitsQuery(rawQuery);
+       // Asignación explícita en el servidor hasta definir integración con PACO.
+       // Sin configuración, ninguna cuenta tiene acceso, tampoco el administrador.
+       authorizeVisitsRoute(userId, query.route, this.config.get<string>('VISITS_ROUTE_ACCESS') ?? '{}');
++      // Este repositorio es el backend académico: por defecto consulta academico.*.
++      // El modo legacy solo se habilita explícitamente desde el servidor.
++      sql = visitedClientsSql(this.config.get<string>('VISITS_DATA_SOURCE') ?? 'academic');
+     } catch (error) {
+       if (error instanceof VisitsInputError) throw new BadRequestException(error.message);
+       if (error instanceof VisitsAccessError) throw new ForbiddenException(error.message);
+-      throw new ServiceUnavailableException('El acceso a visitas aún no está configurado correctamente.');
++      throw new ServiceUnavailableException('La consulta de visitas no está configurada correctamente.');
+     }
+ 
+     try {
+       const rows: VisitsDbRow[] = await this.dataSource.query(
+-        VISITED_CLIENTS_SQL, visitsSqlParameters(query),
++        sql, visitsSqlParameters(query),
+       );
+       return buildVisitsResponse(query, rows, new Date().toISOString());
+     } catch {
+diff --git a/src/visits/visits.spec.ts b/src/visits/visits.spec.ts
+index d5d6fd4..ba24029 100644
+--- a/src/visits/visits.spec.ts
++++ b/src/visits/visits.spec.ts
+@@ -25,7 +25,7 @@ describe('GET /visits/clients', () => {
+       providers: [
+         VisitsService, JwtStrategy,
+         { provide: ConfigService, useValue: new ConfigService({
+-          JWT_SECRET: secret, VISITS_ROUTE_ACCESS: '{"12":["S08"]}',
++          JWT_SECRET: secret, VISITS_ROUTE_ACCESS: '{"12":["S08"]}', VISITS_DATA_SOURCE: 'legacy',
+         }) },
+         { provide: getDataSourceToken('prodConnection'), useValue: sql },
+       ],
+-- 
+2.56.0.windows.2
+

@@ -1,0 +1,78 @@
+<main class="visits" [attr.aria-busy]="loading()">
+  <header class="visits__header">
+    <div>
+      <p class="eyebrow">Demostración académica</p>
+      <h1>Consulta de visitas</h1>
+      <p>Busca clientes con registros por ruta y fecha de Honduras.</p>
+    </div>
+    <nav aria-label="Navegación de visitas">
+      <a routerLink="/chat">Ir al chat</a>
+      <a routerLink="/login">Iniciar sesión</a>
+    </nav>
+  </header>
+
+  <section class="card" aria-label="Filtros de consulta">
+    <p class="hint">Datos ficticios: prueba S08 o S09 con fecha 05/11/2026.</p>
+    <form #filtersForm="ngForm" (ngSubmit)="filtersForm.valid && consult()">
+      <fieldset [disabled]="loading()">
+        <legend class="sr-only">Ruta, fecha y paginación</legend>
+        <label for="visits-route">Ruta
+          <input id="visits-route" name="route" [(ngModel)]="route" required
+            pattern="\s*[A-Za-z0-9][A-Za-z0-9_-]{0,19}\s*" maxlength="24"
+            autocomplete="off" placeholder="S08" />
+        </label>
+        <label for="visits-date">Fecha en Honduras
+          <input id="visits-date" name="date" type="date" [(ngModel)]="date" required
+            min="0001-01-01" max="9999-12-31" />
+        </label>
+        <label for="visits-size">Clientes por página
+          <select id="visits-size" name="pageSize" [(ngModel)]="pageSize">
+            <option [ngValue]="5">5</option>
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="50">50</option>
+          </select>
+        </label>
+        <button type="submit" [disabled]="filtersForm.invalid || loading()">
+          {{ loading() ? 'Consultando…' : 'Consultar' }}
+        </button>
+      </fieldset>
+    </form>
+  </section>
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @if (loading()) {
+    <p role="status">Consultando los registros de visita…</p>
+  }
+  @if (result(); as data) {
+    <section class="card" aria-label="Resultado de la consulta" aria-live="polite">
+      <h2>Ruta {{ data.route }} · {{ data.date }}</h2>
+      <dl class="totals">
+        <div><dt>Clientes distintos</dt><dd>{{ data.totalClients }}</dd></div>
+        <div><dt>Registros de visita</dt><dd>{{ data.totalVisitRecords }}</dd></div>
+      </dl>
+      <p class="hint">{{ data.description }}</p>
+      @if (data.clients.length) {
+        <table>
+          <caption>Clientes de esta página</caption>
+          <thead><tr><th scope="col">Código de cliente</th><th scope="col">Registros</th></tr></thead>
+          <tbody>
+            @for (client of data.clients; track client.clientCode) {
+              <tr><td>{{ client.clientCode }}</td><td>{{ client.visitRecords }}</td></tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <p>{{ data.totalClients === 0 ? 'No hay registros para esta ruta y fecha.' : 'Esta página no contiene clientes.' }}</p>
+      }
+      <div class="pagination">
+        <button type="button" class="secondary" (click)="changePage(data.pagination.page - 1)"
+          [disabled]="loading() || data.pagination.page <= 1">Anterior</button>
+        <span>{{ data.pagination.totalPages === 0 ? 'Sin páginas' : 'Página ' + data.pagination.page + ' de ' + data.pagination.totalPages }}</span>
+        <button type="button" class="secondary" (click)="changePage(data.pagination.page + 1)"
+          [disabled]="loading() || !data.pagination.hasNextPage">Siguiente</button>
+      </div>
+    </section>
+  }
+</main>
