@@ -51,18 +51,18 @@ La guía está en [registro.md](../registro.md). Son cuentas locales con datos f
 | Login | Funciona localmente; pendiente en la URL pública. |
 | Registro público | Implementado y probado localmente con POST /auth/register; interfaz confirmada por el autor; falta publicar. |
 | Logout | El navegador retira sus datos de sesión; falta invalidación en servidor. |
-| Recuperación de contraseña | Implementada y probada localmente con transporte sustituido; falta configurar correo y comprobar recepción real/interfaz. |
+| Recuperación de contraseña | Brevo configurado en privado, correo recibido y cambio/login con contraseña nueva confirmados manualmente por el autor. Pendiente en producción pública. |
 | Matriz de permisos y propiedad | Primera versión documentada y control /users corregido. |
 | Dos roles funcionales | ADMINISTRADOR y USUARIO comprobados por HTTP con SQL local y cuentas reales de demostración; falta la validación completa en producción. |
 | Credenciales para el docente | La cuenta USUARIO local tiene sus credenciales fuera del repositorio; las de la entrega pública y su comunicación privada siguen pendientes. |
 | Validación de usuarios/roles vigentes | Implementada en avance 18; estado/rol actual y huella de contraseña en cada petición. Logout por sesión pendiente. |
 | Frontend, backend y base públicos por HTTPS | Pendiente. Vercel sigue siendo una vista previa. |
 | Release semana-4 | No creado todavía. |
-| 20 commits y 3 recientes | El avance de registro deja 18 commits en el frontend; continuar hasta cumplir el mínimo y los requisitos funcionales. |
+| 20 commits y 3 recientes | Este registro de evidencia deja 19 commits en el frontend; continuar hasta cumplir el mínimo y los requisitos funcionales. |
 
 ## Siguiente paso
 
-Configurar el proveedor, comprobar la recepción real y la interfaz de recuperación; después cierre de sesión con invalidación en servidor, despliegue y prueba completa. El registro y la segunda cuenta local ya están comprobados. El presupuesto autorizado es cero: solo planes gratuitos o créditos estudiantiles comprobados antes de crear recursos.
+Continuar con cierre de sesión con invalidación en servidor, despliegue y prueba completa. La recepción real y el login con contraseña nueva ya fueron confirmados localmente. El registro y la segunda cuenta local ya están comprobados. El presupuesto autorizado es cero: solo planes gratuitos o créditos estudiantiles comprobados antes de crear recursos.
 
 ## Avance 18 · recuperación y vigencia de acceso
 
@@ -73,3 +73,9 @@ Resultados: 69 pruebas en 5 suites aprobadas, backend compilado, frontend desarr
 El autor confirmó manualmente el avance 17: registro, login, cuenta visible con rol USUARIO para el administrador y redirección al chat cuando la cuenta normal abre /users. Ambos repositorios se subieron antes de iniciar el avance 18.
 
 Pendiente del avance de recuperación: cuenta/remitente/clave del proveedor, entrega a buzón y prueba manual de los formularios. Los JWT anteriores al avance 18 requieren iniciar sesión de nuevo. No se creó release ni se publicó una integración funcional en Vercel. Logout con revocación individual, despliegue público y verificación final siguen pendientes.
+
+## Avance 19 · evidencia de recuperación por correo real
+
+El 6 de noviembre de 2026 el autor configuró una clave de Brevo restringida a emails transaccionales y verificó su remitente. Se completaron las cuatro variables de recuperación en el .env privado del backend. Un primer intento respondió 503 porque el proceso conservaba la configuración anterior; después de reiniciar el backend, el autor confirmó que recibió el correo y que pudo establecer otra contraseña e iniciar sesión con ella.
+
+Esta es evidencia manual comunicada por el autor, adicional a las pruebas automáticas y SQL del avance 18. No se incluyen clave, destinatario, enlace ni contraseña en el repositorio. El rechazo manual de la contraseña anterior y del enlace reutilizado aún no fue confirmado; los dos casos ya tienen pruebas automáticas/local SQL. La prueba ocurrió en localhost, no certifica la URL pública. Continúan pendientes logout en servidor, despliegue y release semana-4.

@@ -20,7 +20,7 @@ Permiso indica que el servidor deja llegar a la operación, no que todas las fun
 |---|---|---|---|---|---|
 | Solicitar login | POST /auth/login | Credenciales válidas | Credenciales válidas | Credenciales válidas | Contraseña bcrypt y estado activo del usuario y su rol. |
 | Crear cuenta pública | POST /auth/register | Sí, con datos válidos | Sí, sin crear sesión automática | Sí, siempre crea USUARIO | Guarda de campos + DTO + rol 2 activo fijado por servidor. |
-| Solicitar recuperación | POST /auth/forgot-password | Sí, sujeto a límite | Sí | Sí | Respuesta genérica; correo al titular si activo; proveedor pendiente de configurar. |
+| Solicitar recuperación | POST /auth/forgot-password | Sí, sujeto a límite | Sí | Sí | Respuesta genérica; correo al titular si activo; proveedor configurado localmente. |
 | Establecer contraseña recuperada | POST /auth/reset-password | Solo con enlace válido | Solo con enlace válido | Solo con enlace válido | Firma, propósito, audiencia, caducidad y huella vigente; cambio atómico invalida enlaces y JWT anteriores. |
 | Listar usuarios | GET /users | No | No | Sí | JwtAuthGuard + AdminGuard. |
 | Consultar una cuenta | GET /users/:id | No | No, tampoco la propia por este endpoint | Sí | JwtAuthGuard + AdminGuard. |
@@ -47,12 +47,12 @@ Desde el avance 16, los cinco endpoints /users requieren administrador también 
 | Acción prevista | Quién podrá usarla | Regla obligatoria al implementarla | Estado |
 |---|---|---|---|
 | Registro público | Visitante | El servidor asigna USUARIO; no acepta elegir administrador, activar roles ni concederse rutas desde el formulario. | Implementado localmente: POST /auth/register y /register. Ver docs/registro.md. |
-| Recuperar contraseña | Persona que controla el correo de su cuenta | Respuesta genérica, token con caducidad, un solo uso y almacenamiento protegido; envío al correo mediante el proveedor configurado. | Implementado localmente; configuración y recepción real de correo pendientes. |
-| Establecer contraseña recuperada | Portador del token válido de recuperación | Cambiar solo la cuenta vinculada al token; invalidar el token y las sesiones anteriores de esa cuenta. | Implementado localmente; configuración y recepción real de correo pendientes. |
+| Recuperar contraseña | Persona que controla el correo de su cuenta | Respuesta genérica, token con caducidad, un solo uso y almacenamiento protegido; envío al correo mediante el proveedor configurado. | Implementado localmente; correo recibido y cambio/login con contraseña nueva confirmados por el autor. |
+| Establecer contraseña recuperada | Portador del token válido de recuperación | Cambiar solo la cuenta vinculada al token; invalidar el token y las sesiones anteriores de esa cuenta. | Implementado localmente; correo recibido y cambio/login con contraseña nueva confirmados por el autor. |
 | Cerrar sesión en el servidor | Usuario autenticado, incluido administrador | Invalidar la sesión correspondiente; no aceptar un userId ajeno para cerrar otras sesiones. | Actualmente solo se retira token/usuario del navegador; el JWT puede seguir válido hasta vencer. |
 | Desactivar usuario/rol o cambiar permisos | Administrador | Las solicitudes posteriores deben consultar el estado y permisos vigentes; no conservar privilegios por un JWT antiguo. | Implementado: JWT consulta cuenta y rol activos, toma roleId vigente y comprueba huella de contraseña. Logout por sesión aún pendiente. |
 
-POST /auth/register ya está implementado. La recuperación está implementada con configuración y recepción real de correo pendientes; el logout en servidor sigue pendiente. No se presenta como existente una recuperación de contraseña que solo tenga un botón o una simulación de correo.
+POST /auth/register ya está implementado. La recuperación está implementada y comprobada con recepción real en localhost; el logout en servidor sigue pendiente. No se presenta como existente una recuperación de contraseña que solo tenga un botón o una simulación de correo.
 
 ## Propiedad y alcance del dato
 
