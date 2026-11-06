@@ -9,7 +9,7 @@ El frontend parte de 15 commits. La entrega exige al menos 20 en total, con 3 en
 | Avance | Trabajo | Estado |
 |---|---|---|
 | 16 | Auditar permisos, crear docs/permisos.md y exigir administrador en /users desde el backend. | Primer paso completado: compilación y 20 pruebas correctas; ver bitácora de semana 4. |
-| Siguiente | Registro público con rol USUARIO decidido por el servidor y validaciones; segundo usuario de demostración y control de roles vigentes. | Pendiente. |
+| 17 | Registro público con rol USUARIO fijado por servidor, formulario y segunda cuenta local de demostración. El login comprueba rol activo; revalidar JWT existentes sigue pendiente. | Implementado y comprobado: 42 pruebas y 8 comprobaciones HTTP/SQL reales; ver docs/registro.md. |
 | Siguiente | Recuperación real de contraseña: token limitado y de un uso, proveedor de correo y pantalla para establecer contraseña. | Pendiente. |
 | Siguiente | Cierre de sesión con invalidación en servidor y reglas de acceso/propiedad, con pruebas permitidas y denegadas por rol. | Pendiente. |
 | Cierre | Publicar el flujo por HTTPS con base académica, probar cuentas por rol, completar docs/bitacora/semana-4.md y release semana-4. | Pendiente. No se marca entregado todavía. |

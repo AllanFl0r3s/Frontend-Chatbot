@@ -38,3 +38,12 @@ export interface AuthResponse {
   user: User;
 }
 
+
+// El registro público no acepta rol ni estado.
+export interface RegisterPayload {
+  nombre: string;
+  usuario: string;
+  email: string;
+  password: string;
+}
+export interface RegisterResponse { message: string; }

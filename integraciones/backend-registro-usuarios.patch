@@ -1,0 +1,411 @@
+From 242a23d96b9e8e5481eb133d7955ff92dca4f110 Mon Sep 17 00:00:00 2001
+From: AllanFl0r3s <Allan_Flores07@outlook.com>
+Date: Fri, 6 Nov 2026 13:03:39 -0600
+Subject: [PATCH] feat: agregar registro publico con rol usuario asignado en
+ servidor
+
+---
+ README.md                                 |  12 +-
+ src/auth/auth.controller.ts               |  16 ++-
+ src/auth/auth.module.ts                   |   6 +-
+ src/auth/auth.register.spec.ts            | 145 ++++++++++++++++++++++
+ src/auth/auth.service.ts                  |  48 ++++++-
+ src/auth/dto/register-response.dto.ts     |   6 +
+ src/auth/dto/register.dto.ts              |  35 ++++++
+ src/auth/guards/register-payload.guard.ts |  16 +++
+ 8 files changed, 277 insertions(+), 7 deletions(-)
+ create mode 100644 src/auth/auth.register.spec.ts
+ create mode 100644 src/auth/dto/register-response.dto.ts
+ create mode 100644 src/auth/dto/register.dto.ts
+ create mode 100644 src/auth/guards/register-payload.guard.ts
+
+diff --git a/README.md b/README.md
+index 9908901..1a6dcbf 100644
+--- a/README.md
++++ b/README.md
+@@ -134,6 +134,16 @@ de inventario y otras consultas del chat todavía no se adaptaron a las tablas n
+ Los cinco endpoints /users requieren JWT y administrador en el servidor. Angular
+ no es el límite de seguridad. El 6 de noviembre de 2026 se compiló el backend y
+ pasaron 20 pruebas en users.permissions.spec.ts, visits.academic.spec.ts y
+-visits.spec.ts (persistencia simulada). Registro público, recuperación y logout
++visits.spec.ts (persistencia simulada). Recuperación y logout
+ con invalidación en servidor siguen pendientes. La matriz y el estado del avance
+ están en docs/permisos.md y docs/bitacora/semana-4.md del repositorio Frontend-Chatbot.
++
++## Semana 4: registro público local
++
++POST /auth/register acepta nombre, usuario, email y password; el servidor asigna
++USUARIO (ID 2 activo), sin rutas. No devuelve JWT ni hash y no reemplaza la API
++administrativa /users. El login también exige rol activo. Se reutilizan las tablas
++existentes: no hay que recrear las bases. El 6 de noviembre se aprobaron 42 pruebas
++y 8 comprobaciones HTTP contra SQL local real. Las credenciales de demostración
++se guardaron fuera de los repositorios. Recuperación, invalidación de sesiones
++y despliegue público siguen pendientes. Guía: docs/registro.md del frontend.
+diff --git a/src/auth/auth.controller.ts b/src/auth/auth.controller.ts
+index 6147eed..ffd185d 100644
+--- a/src/auth/auth.controller.ts
++++ b/src/auth/auth.controller.ts
+@@ -1,8 +1,11 @@
+-import { Body, Controller, Post } from '@nestjs/common';
++import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+ import { AuthService } from './auth.service';
+ import { AuthResponseDto } from './dto/auth-response.dto';
+ import { LoginDto } from './dto/login.dto';
++import { RegisterDto } from './dto/register.dto';
++import { RegisterResponseDto } from './dto/register-response.dto';
++import { RegisterPayloadGuard } from './guards/register-payload.guard';
+ 
+ @ApiTags('auth')
+ @Controller('auth')
+@@ -15,4 +18,15 @@ export class AuthController {
+   async login(@Body() dto: LoginDto): Promise<AuthResponseDto> {
+     return this.authService.login(dto);
+   }
++
++  @Post('register')
++  @UseGuards(RegisterPayloadGuard)
++  @ApiOperation({ summary: 'Crear una cuenta de usuario, sin permisos administrativos ni rutas asignadas' })
++  @ApiResponse({ status: 201, type: RegisterResponseDto })
++  @ApiResponse({ status: 400, description: 'Datos inválidos o campos no permitidos' })
++  @ApiResponse({ status: 409, description: 'Correo o usuario no disponible' })
++  @ApiResponse({ status: 503, description: 'No se pudo completar el registro' })
++  register(@Body() dto: RegisterDto): Promise<RegisterResponseDto> {
++    return this.authService.register(dto);
++  }
+ }
+diff --git a/src/auth/auth.module.ts b/src/auth/auth.module.ts
+index 11e2b42..9597519 100644
+--- a/src/auth/auth.module.ts
++++ b/src/auth/auth.module.ts
+@@ -4,6 +4,8 @@ import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
+ import { PassportModule } from '@nestjs/passport';
+ import { TypeOrmModule } from '@nestjs/typeorm';
+ import { User } from '../users/user.entity';
++import { Role } from '../roles/role.entity';
++import { RegisterPayloadGuard } from './guards/register-payload.guard';
+ import { AuthController } from './auth.controller';
+ import { AuthService } from './auth.service';
+ import { JwtStrategy } from './jwt.strategy';
+@@ -40,9 +42,9 @@ import { JwtStrategy } from './jwt.strategy';
+         };
+       },
+     }),
+-    TypeOrmModule.forFeature([User]),
++    TypeOrmModule.forFeature([User, Role]),
+   ],
+   controllers: [AuthController],
+-  providers: [AuthService, JwtStrategy],
++  providers: [AuthService, JwtStrategy, RegisterPayloadGuard],
+ })
+ export class AuthModule {}
+diff --git a/src/auth/auth.register.spec.ts b/src/auth/auth.register.spec.ts
+new file mode 100644
+index 0000000..88d72bb
+--- /dev/null
++++ b/src/auth/auth.register.spec.ts
+@@ -0,0 +1,145 @@
++import { Test } from '@nestjs/testing';
++import { JwtModule, JwtService } from '@nestjs/jwt';
++import { PassportModule } from '@nestjs/passport';
++import { ConfigService } from '@nestjs/config';
++import { getRepositoryToken } from '@nestjs/typeorm';
++import { ValidationPipe } from '@nestjs/common';
++import type { INestApplication } from '@nestjs/common';
++import request from 'supertest';
++import * as bcrypt from 'bcrypt';
++import { AuthController } from './auth.controller';
++import { AuthService } from './auth.service';
++import { JwtStrategy } from './jwt.strategy';
++import { RegisterPayloadGuard } from './guards/register-payload.guard';
++import { AdminGuard } from './guards/admin.guard';
++import { User } from '../users/user.entity';
++import { Role } from '../roles/role.entity';
++import { UsersController } from '../users/users.controller';
++import { UsersService } from '../users/users.service';
++
++// Contraseñas exclusivamente de pruebas; no se crea ninguna cuenta SQL ni se envía correo.
++describe('Registro público: validación, rol fijo y login posterior', () => {
++  let app: INestApplication;
++  let jwt: JwtService;
++  const role = { id: 2, nombre: 'USUARIO', estado: true };
++  const body = { nombre: '  Persona ficticia  ', usuario: '  Persona.Demo  ',
++    email: '  PERSONA@example.invalid  ', password: 'UnaClaveDePrueba-2026!' };
++  const lookup = { where: jest.fn().mockReturnThis(), orWhere: jest.fn().mockReturnThis(),
++    leftJoinAndSelect: jest.fn().mockReturnThis(), getOne: jest.fn() };
++  const users = { createQueryBuilder: jest.fn(), create: jest.fn(), save: jest.fn() };
++  const roles = { findOne: jest.fn() };
++  const adminServices = { findAll: jest.fn().mockResolvedValue([]) };
++
++  beforeAll(async () => {
++    const secret = 'registration-tests-only-not-a-real-secret';
++    const module = await Test.createTestingModule({
++      imports: [PassportModule, JwtModule.register({ secret })],
++      controllers: [AuthController, UsersController],
++      providers: [AuthService, JwtStrategy, AdminGuard, RegisterPayloadGuard,
++        { provide: ConfigService, useValue: new ConfigService({ JWT_SECRET: secret }) },
++        { provide: getRepositoryToken(User), useValue: users },
++        { provide: getRepositoryToken(Role), useValue: roles },
++        { provide: UsersService, useValue: adminServices },
++      ],
++    }).compile();
++    jwt = module.get(JwtService);
++    app = module.createNestApplication();
++    // Mismas opciones globales de la aplicación, para probar que la guarda ve
++    // campos privilegiados antes de que whitelist los retire.
++    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
++    await app.init();
++  });
++  beforeEach(() => {
++    jest.clearAllMocks();
++    lookup.getOne.mockReset().mockResolvedValue(null);
++    users.createQueryBuilder.mockReturnValue(lookup);
++    users.create.mockImplementation(value => ({ ...value }));
++    users.save.mockReset().mockImplementation(async value => ({ ...value, id: 9 }));
++    roles.findOne.mockReset().mockResolvedValue({ ...role });
++  });
++  afterAll(async () => { await app?.close(); });
++
++  it('normaliza identificadores, usa rol 2 y guarda bcrypt sin devolver secretos ni JWT', async () => {
++    const result = await request(app.getHttpServer()).post('/auth/register').send(body).expect(201);
++    const saved = users.save.mock.calls[0][0];
++    expect(saved).toMatchObject({ nombre: 'Persona ficticia', usuario: 'persona.demo',
++      email: 'persona@example.invalid', roleId: 2, estado: true });
++    expect(saved.passwordHash).not.toBe(body.password);
++    expect(await bcrypt.compare(body.password, saved.passwordHash)).toBe(true);
++    expect(result.body).toEqual({ message: 'Cuenta creada. Ya puedes iniciar sesión.' });
++  });
++
++  it('la cuenta registrada puede iniciar sesión, pero no administrar usuarios', async () => {
++    await request(app.getHttpServer()).post('/auth/register').send(body).expect(201);
++    lookup.getOne.mockResolvedValue({ ...users.save.mock.calls[0][0], id: 9 });
++    const login = await request(app.getHttpServer()).post('/auth/login')
++      .send({ identifier: 'PERSONA.DEMO', password: body.password }).expect(201);
++    expect(login.body.user.roleId).toBe(2);
++    expect(login.body.user).not.toHaveProperty('passwordHash');
++    expect(jwt.verify(login.body.accessToken).roleId).toBe(2);
++    await request(app.getHttpServer()).get('/users')
++      .set('Authorization', `Bearer ${login.body.accessToken}`).expect(403);
++    expect(adminServices.findAll).not.toHaveBeenCalled();
++  });
++
++  it.each([{ roleId: 1 }, { estado: false }, { passwordHash: 'hash-elegido-por-el-cliente' },
++    { role: { id: 1 } }, { id: 1 }])('rechaza campos controlados por el servidor: %j', async extra => {
++    await request(app.getHttpServer()).post('/auth/register').send({ ...body, ...extra }).expect(400);
++    expect(users.save).not.toHaveBeenCalled();
++    expect(roles.findOne).not.toHaveBeenCalled();
++  });
++
++  it.each([
++    { password: 'corta' }, { usuario: 'nombre@correo.com' }, { email: 'sin-correo' },
++    { nombre: '   ' }, { password: '😀'.repeat(24) },
++  ])('rechaza datos inválidos o contraseña que bcrypt truncaría: %j', async invalid => {
++    await request(app.getHttpServer()).post('/auth/register').send({ ...body, ...invalid }).expect(400);
++    expect(users.save).not.toHaveBeenCalled();
++  });
++
++  it('rechaza un identificador existente sin guardar otra cuenta', async () => {
++    lookup.getOne.mockResolvedValue({ id: 7 });
++    await request(app.getHttpServer()).post('/auth/register').send(body).expect(409);
++    expect(users.save).not.toHaveBeenCalled();
++  });
++
++  it.each([2601, 2627])('convierte UNIQUE de SQL Server %s en conflicto sin detalles internos', async number => {
++    users.save.mockRejectedValueOnce({ driverError: { number }, message: 'provider-private-details' });
++    const result = await request(app.getHttpServer()).post('/auth/register').send(body).expect(409);
++    expect(JSON.stringify(result.body)).not.toContain('provider-private-details');
++  });
++
++  it.each([null, { ...role, estado: false }, { ...role, nombre: 'ADMINISTRADOR' }])
++  ('no crea cuentas cuando el rol 2 falta, está inactivo o no es USUARIO', async configuredRole => {
++    roles.findOne.mockResolvedValue(configuredRole);
++    await request(app.getHttpServer()).post('/auth/register').send(body).expect(503);
++    expect(users.save).not.toHaveBeenCalled();
++  });
++
++  it('no expone errores de persistencia al cliente', async () => {
++    users.save.mockRejectedValueOnce(new Error('SQL-private-host-details'));
++    const result = await request(app.getHttpServer()).post('/auth/register').send(body).expect(503);
++    expect(JSON.stringify(result.body)).not.toContain('SQL-private-host-details');
++  });
++
++  it('rechaza un cuerpo que no sea un objeto', async () => {
++    await request(app.getHttpServer()).post('/auth/register').send([]).expect(400);
++    expect(users.save).not.toHaveBeenCalled();
++  });
++
++  it('no emite un nuevo JWT al iniciar sesión con rol inactivo', async () => {
++    lookup.getOne.mockResolvedValue({ id: 9, estado: true, role: { ...role, estado: false }, passwordHash: 'no-se-compara' });
++    await request(app.getHttpServer()).post('/auth/login')
++      .send({ identifier: 'persona.demo', password: body.password }).expect(403);
++  });
++
++  it('conserva el login y acceso administrativo de la cuenta administradora activa', async () => {
++    lookup.getOne.mockResolvedValue({ id: 1, roleId: 1, estado: true,
++      role: { id: 1, nombre: 'ADMINISTRADOR', estado: true },
++      passwordHash: await bcrypt.hash(body.password, 4) });
++    const login = await request(app.getHttpServer()).post('/auth/login')
++      .send({ identifier: 'admin.prueba', password: body.password }).expect(201);
++    await request(app.getHttpServer()).get('/users')
++      .set('Authorization', `Bearer ${login.body.accessToken}`).expect(200);
++  });
++});
+diff --git a/src/auth/auth.service.ts b/src/auth/auth.service.ts
+index 14e776f..ae8efd5 100644
+--- a/src/auth/auth.service.ts
++++ b/src/auth/auth.service.ts
+@@ -1,9 +1,12 @@
+-import { Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
++import { Injectable, UnauthorizedException, ForbiddenException, ConflictException, HttpException, ServiceUnavailableException } from '@nestjs/common';
+ import { JwtService } from '@nestjs/jwt';
+ import { InjectRepository } from '@nestjs/typeorm';
+ import * as bcrypt from 'bcrypt';
+ import { Repository } from 'typeorm';
+ import { User } from '../users/user.entity';
++import { Role } from '../roles/role.entity';
++import { RegisterDto } from './dto/register.dto';
++import { RegisterResponseDto } from './dto/register-response.dto';
+ import { LoginDto } from './dto/login.dto';
+ import { AuthResponseDto } from './dto/auth-response.dto';
+ 
+@@ -13,6 +16,7 @@ export class AuthService {
+     @InjectRepository(User)
+     private readonly usersRepository: Repository<User>,
+     private readonly jwtService: JwtService,
++    @InjectRepository(Role) private readonly rolesRepository: Repository<Role>,
+   ) {}
+ 
+   private toResponse(user: User) {
+@@ -48,8 +52,8 @@ export class AuthService {
+       throw new UnauthorizedException('Credenciales incorrectas');
+     }
+ 
+-    if (!user.estado) {
+-      throw new ForbiddenException('Usuario inactivo');
++    if (!user.estado || !user.role?.estado) {
++      throw new ForbiddenException('Cuenta o rol inactivo');
+     }
+ 
+     const isValid = await bcrypt.compare(password, user.passwordHash);
+@@ -76,4 +80,42 @@ export class AuthService {
+       user: this.toResponse(user),
+     };
+   }
++
++  async register(dto: RegisterDto): Promise<RegisterResponseDto> {
++    try {
++      // Siempre se comprueba el rol de la instalación académica, no uno elegido por el cliente.
++      const role = await this.rolesRepository.findOne({ where: { id: 2 } });
++      if (!role || !role.estado || role.nombre.trim().toUpperCase() !== 'USUARIO') {
++        throw new ServiceUnavailableException('El registro de usuarios no está disponible.');
++      }
++      const identifiers = [dto.email, dto.usuario];
++      const existing = await this.usersRepository.createQueryBuilder('user')
++        .where('LOWER(user.email) IN (:...identifiers)', { identifiers })
++        .orWhere('LOWER(user.usuario) IN (:...identifiers)', { identifiers })
++        .getOne();
++      if (existing) throw new ConflictException('El correo o usuario no está disponible.');
++
++      const passwordHash = await bcrypt.hash(dto.password, 12);
++      // Asignación explícita: no propagar dto con spread hacia una entidad privilegiada.
++      const user = this.usersRepository.create({
++        nombre: dto.nombre, usuario: dto.usuario, email: dto.email,
++        passwordHash, roleId: 2, role, estado: true, fechaRegistro: new Date(),
++      });
++      await this.usersRepository.save(user);
++      // Registrarse no crea un JWT ni expone el hash: se inicia sesión por el flujo normal.
++      return { message: 'Cuenta creada. Ya puedes iniciar sesión.' };
++    } catch (error) {
++      if (error instanceof HttpException) throw error;
++      // El índice UNIQUE es la protección final si dos registros compiten.
++      const failure = error as { number?: number; driverError?: {
++        number?: number; originalError?: { info?: { number?: number } };
++      } };
++      const sqlNumber = failure?.driverError?.number
++        ?? failure?.driverError?.originalError?.info?.number ?? failure?.number;
++      if (sqlNumber === 2601 || sqlNumber === 2627) {
++        throw new ConflictException('El correo o usuario no está disponible.');
++      }
++      throw new ServiceUnavailableException('No fue posible crear la cuenta. Intenta más tarde.');
++    }
++  }
+ }
+\ No newline at end of file
+diff --git a/src/auth/dto/register-response.dto.ts b/src/auth/dto/register-response.dto.ts
+new file mode 100644
+index 0000000..60acdd5
+--- /dev/null
++++ b/src/auth/dto/register-response.dto.ts
+@@ -0,0 +1,6 @@
++import { ApiProperty } from '@nestjs/swagger';
++
++export class RegisterResponseDto {
++  @ApiProperty({ example: 'Cuenta creada. Ya puedes iniciar sesión.' })
++  message!: string;
++}
+diff --git a/src/auth/dto/register.dto.ts b/src/auth/dto/register.dto.ts
+new file mode 100644
+index 0000000..0a28afd
+--- /dev/null
++++ b/src/auth/dto/register.dto.ts
+@@ -0,0 +1,35 @@
++import { Transform } from 'class-transformer';
++import { IsByteLength, IsEmail, IsString, Matches, MaxLength, MinLength } from 'class-validator';
++import { ApiProperty } from '@nestjs/swagger';
++
++const trimmed = ({ value }: { value: unknown }) => typeof value === 'string' ? value.trim() : value;
++const normalized = ({ value }: { value: unknown }) => typeof value === 'string' ? value.trim().toLowerCase() : value;
++
++// Solo datos de la persona. Rol, estado, hash e identificador no forman parte del contrato.
++export class RegisterDto {
++  @ApiProperty({ example: 'Persona de demostración', minLength: 2, maxLength: 150 })
++  @Transform(trimmed)
++  @IsString()
++  @MinLength(2, { message: 'El nombre debe tener al menos 2 caracteres.' })
++  @MaxLength(150)
++  nombre!: string;
++
++  @ApiProperty({ example: 'usuario.demo', minLength: 3, maxLength: 50 })
++  @Transform(normalized)
++  @IsString()
++  @Matches(/^[a-z0-9][a-z0-9._-]{2,49}$/, { message: 'El usuario debe tener de 3 a 50 letras, números, puntos, guiones o guiones bajos.' })
++  usuario!: string;
++
++  @ApiProperty({ example: 'persona@example.invalid', maxLength: 150 })
++  @Transform(normalized)
++  @IsEmail({}, { message: 'Escribe un correo válido.' })
++  @MaxLength(150)
++  email!: string;
++
++  @ApiProperty({ format: 'password', minLength: 12, maxLength: 72 })
++  @IsString()
++  @MinLength(12, { message: 'La contraseña debe tener al menos 12 caracteres.' })
++  // bcrypt limita por bytes, no por caracteres: evita truncamiento con texto Unicode.
++  @IsByteLength(0, 72, { message: 'La contraseña es demasiado larga.' })
++  password!: string;
++}
+diff --git a/src/auth/guards/register-payload.guard.ts b/src/auth/guards/register-payload.guard.ts
+new file mode 100644
+index 0000000..c6e1914
+--- /dev/null
++++ b/src/auth/guards/register-payload.guard.ts
+@@ -0,0 +1,16 @@
++import { BadRequestException, CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
++
++@Injectable()
++export class RegisterPayloadGuard implements CanActivate {
++  canActivate(context: ExecutionContext): boolean {
++    const body: unknown = context.switchToHttp().getRequest().body;
++    const allowed = new Set(['nombre', 'usuario', 'email', 'password']);
++    // Las guardas corren antes de ValidationPipe: se rechazan campos inesperados
++    // antes de que el whitelist global los borre silenciosamente.
++    if (!body || typeof body !== 'object' || Array.isArray(body)
++      || Object.keys(body).some(key => !allowed.has(key))) {
++      throw new BadRequestException('Envía solo nombre, usuario, email y password.');
++    }
++    return true;
++  }
++}
+-- 
+2.56.0.windows.2
+

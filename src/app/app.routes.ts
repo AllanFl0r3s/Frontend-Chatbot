@@ -13,6 +13,12 @@ export const routes: Routes = [
       import('./auth/login.component').then((m) => m.LoginComponent),
   },
 
+  // Registro público: el backend fija el rol y valida todos los datos.
+  {
+    path: 'register',
+    title: 'Crear cuenta | Chatbot',
+    loadComponent: () => import('./auth/register.component').then(m => m.RegisterComponent),
+  },
   // Usuarios autenticados
   {
     path: 'chat',

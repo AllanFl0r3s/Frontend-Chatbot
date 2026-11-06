@@ -3,7 +3,7 @@ import { inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { AuthResponse, LoginPayload, User } from './models';
+import { AuthResponse, LoginPayload, RegisterPayload, RegisterResponse, User } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -25,6 +25,10 @@ export class AuthService {
       );
   }
 
+  register(payload: RegisterPayload) {
+    // Sin tap de sesión: registrarse no almacena JWT ni cambia el usuario autenticado.
+    return this.http.post<RegisterResponse>(`${environment.apiUrl}/auth/register`, payload);
+  }
   logout() {
     this.clearToken();
     this.clearUser();
