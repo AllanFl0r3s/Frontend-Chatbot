@@ -41,7 +41,7 @@ Resultados del 6 de noviembre:
 - Frontend compilado para desarrollo/SSR y para preview. La vista previa mantiene el registro deshabilitado.
 - **8 comprobaciones HTTP contra SQL real** correctas: registro persistido, login USUARIO, administración denegada, perfil permitido, ruta no asignada denegada, duplicado 409, campos de privilegios 400 y login/acceso administrativo preservados.
 - Se creó una cuenta local USUARIO para demostrar el segundo rol. Sus credenciales se guardaron fuera de los repositorios de frontend/backend; no se enviaron al docente automáticamente. El administrador conserva su contraseña y no se concedieron rutas nuevas.
-- La prueba HTTP arrancó la aplicación en un puerto temporal de loopback y la cerró al terminar. El formulario interactivo en el navegador sigue pendiente de confirmación por el autor; no se publicó este cambio en Vercel.
+- La prueba HTTP arrancó la aplicación en un puerto temporal de loopback y la cerró al terminar. El formulario interactivo, registro, login y redirección de USUARIO fuera de /users fueron confirmados por el autor; no se publicó este cambio en Vercel.
 
 La guía está en [registro.md](../registro.md). Son cuentas locales con datos ficticios; las cuentas para la entrega pública se prepararán aparte y se compartirán privadamente.
 ## Estado frente a la entrega de semana 4
@@ -49,17 +49,27 @@ La guía está en [registro.md](../registro.md). Son cuentas locales con datos f
 | Requisito | Estado actual |
 |---|---|
 | Login | Funciona localmente; pendiente en la URL pública. |
-| Registro público | Implementado y probado localmente con POST /auth/register; falta publicar y confirmar la interfaz interactiva. |
+| Registro público | Implementado y probado localmente con POST /auth/register; interfaz confirmada por el autor; falta publicar. |
 | Logout | El navegador retira sus datos de sesión; falta invalidación en servidor. |
-| Recuperación de contraseña | Pendiente de backend, frontend y entrega real de correo. |
+| Recuperación de contraseña | Implementada y probada localmente con transporte sustituido; falta configurar correo y comprobar recepción real/interfaz. |
 | Matriz de permisos y propiedad | Primera versión documentada y control /users corregido. |
 | Dos roles funcionales | ADMINISTRADOR y USUARIO comprobados por HTTP con SQL local y cuentas reales de demostración; falta la validación completa en producción. |
 | Credenciales para el docente | La cuenta USUARIO local tiene sus credenciales fuera del repositorio; las de la entrega pública y su comunicación privada siguen pendientes. |
-| Validación de usuarios/roles vigentes | Falta revalidar estado y resolver revocación de tokens anteriores tras cambios. |
+| Validación de usuarios/roles vigentes | Implementada en avance 18; estado/rol actual y huella de contraseña en cada petición. Logout por sesión pendiente. |
 | Frontend, backend y base públicos por HTTPS | Pendiente. Vercel sigue siendo una vista previa. |
 | Release semana-4 | No creado todavía. |
-| 20 commits y 3 recientes | El avance de registro deja 17 commits en el frontend; continuar hasta cumplir el mínimo y los requisitos funcionales. |
+| 20 commits y 3 recientes | El avance de registro deja 18 commits en el frontend; continuar hasta cumplir el mínimo y los requisitos funcionales. |
 
 ## Siguiente paso
 
-Continuar con recuperación de contraseña y proveedor de correo; después cierre de sesión con invalidación en servidor, revalidación de JWT, despliegue y prueba completa. El registro y la segunda cuenta local ya están comprobados. El presupuesto autorizado es cero: solo planes gratuitos o créditos estudiantiles comprobados antes de crear recursos.
+Configurar el proveedor, comprobar la recepción real y la interfaz de recuperación; después cierre de sesión con invalidación en servidor, despliegue y prueba completa. El registro y la segunda cuenta local ya están comprobados. El presupuesto autorizado es cero: solo planes gratuitos o créditos estudiantiles comprobados antes de crear recursos.
+
+## Avance 18 · recuperación y vigencia de acceso
+
+Implementado el flujo de recuperación y sus formularios, integración Brevo por HTTPS y comprobación de vigencia de JWT en servidor. Detalle y configuración en [recuperacion-contrasena.md](../recuperacion-contrasena.md).
+
+Resultados: 69 pruebas en 5 suites aprobadas, backend compilado, frontend desarrollo/SSR y preview compilados; 10 comprobaciones contra SQL local correctas con transporte de correo sustituido. La cuenta temporal se eliminó; administrador y cuenta del autor conservaron sus contraseñas. No se envió correo real ni se configuraron secretos. El .env privado no se modificó. No hubo cambios de esquema ni reinicio de SQL.
+
+El autor confirmó manualmente el avance 17: registro, login, cuenta visible con rol USUARIO para el administrador y redirección al chat cuando la cuenta normal abre /users. Ambos repositorios se subieron antes de iniciar el avance 18.
+
+Pendiente del avance de recuperación: cuenta/remitente/clave del proveedor, entrega a buzón y prueba manual de los formularios. Los JWT anteriores al avance 18 requieren iniciar sesión de nuevo. No se creó release ni se publicó una integración funcional en Vercel. Logout con revocación individual, despliegue público y verificación final siguen pendientes.

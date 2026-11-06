@@ -47,7 +47,7 @@ No se necesita una migración nueva: se reutilizan TBL_USUARIOS, TBL_ROLES y los
 - HTTP con SQL Server local real, usando la aplicación completa en un puerto temporal de loopback: 8 comprobaciones correctas. Se creó una cuenta de demostración USUARIO, se inició sesión, se comprobó acceso permitido al perfil y denegado a administración/ruta no asignada, duplicados, campos privilegiados y acceso del administrador existente.
 - El servidor temporal de prueba se cerró al terminar. La prueba no cambió la contraseña del administrador ni concedió rutas a la cuenta nueva.
 
-Las pruebas automáticas cubren normalización, hash y respuesta sin secretos, login posterior, protección administrativa, campos privilegiados, datos inválidos/Unicode, duplicados y errores de persistencia, configuración de rol y login con rol inactivo. La suite usa persistencia simulada; la comprobación HTTP/SQL real se realizó aparte. Todavía falta confirmar el formulario interactivo en el navegador del autor.
+Las pruebas automáticas cubren normalización, hash y respuesta sin secretos, login posterior, protección administrativa, campos privilegiados, datos inválidos/Unicode, duplicados y errores de persistencia, configuración de rol y login con rol inactivo. La suite usa persistencia simulada; la comprobación HTTP/SQL real se realizó aparte. El autor confirmó manualmente registro, login con la cuenta creada, presencia de la cuenta con rol USUARIO en administración y redirección al chat al intentar abrir /users como USUARIO.
 
 ## Cuentas de demostración
 
@@ -58,7 +58,7 @@ Son cuentas locales de demostración. Las cuentas y credenciales para la entrega
 ## Qué sigue pendiente
 
 - Recuperación de contraseña y proveedor real de correo.
-- Logout con invalidación en servidor y revocación/revalidación de tokens existentes.
+- Logout con invalidación en servidor. La revalidación de estado/rol/JWT y la revocación por cambio de contraseña se implementaron en el avance 18.
 - Pruebas manuales de la interfaz, límites de intentos y configuración de publicación.
 - Backend y base académica públicos por HTTPS, cuentas privadas de entrega y release semana-4.
 

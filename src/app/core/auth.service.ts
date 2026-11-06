@@ -29,6 +29,12 @@ export class AuthService {
     // Sin tap de sesión: registrarse no almacena JWT ni cambia el usuario autenticado.
     return this.http.post<RegisterResponse>(`${environment.apiUrl}/auth/register`, payload);
   }
+  forgotPassword(email: string) {
+    return this.http.post<{ message: string }>(`${environment.apiUrl}/auth/forgot-password`, { email });
+  }
+  resetPassword(token: string, password: string) {
+    return this.http.post<{ message: string }>(`${environment.apiUrl}/auth/reset-password`, { token, password });
+  }
   logout() {
     this.clearToken();
     this.clearUser();

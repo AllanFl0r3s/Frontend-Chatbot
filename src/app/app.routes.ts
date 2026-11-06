@@ -19,6 +19,10 @@ export const routes: Routes = [
     title: 'Crear cuenta | Chatbot',
     loadComponent: () => import('./auth/register.component').then(m => m.RegisterComponent),
   },
+  { path: 'forgot-password', title: 'Recuperar contraseña | Chatbot',
+    loadComponent: () => import('./auth/password-recovery.component').then(m => m.PasswordRecoveryComponent) },
+  { path: 'reset-password', title: 'Nueva contraseña | Chatbot', data: { reset: true },
+    loadComponent: () => import('./auth/password-recovery.component').then(m => m.PasswordRecoveryComponent) },
   // Usuarios autenticados
   {
     path: 'chat',
