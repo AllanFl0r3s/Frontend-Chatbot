@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs';
+import { catchError, defer, EMPTY, finalize, map, of, tap, throwError, timeout } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthResponse, LoginPayload, RegisterPayload, RegisterResponse, User } from './models';
 
@@ -13,6 +13,8 @@ export class AuthService {
   private readonly http = inject(HttpClient);
 
   readonly user = signal<User | null>(this.readUser());
+  readonly loggingOut = signal(false);
+  readonly logoutError = signal('');
 
   login(payload: LoginPayload) {
     return this.http
@@ -36,8 +38,33 @@ export class AuthService {
     return this.http.post<{ message: string }>(`${environment.apiUrl}/auth/reset-password`, { token, password });
   }
   logout() {
-    this.clearToken();
-    this.clearUser();
+    return defer(() => {
+      if (this.loggingOut()) return EMPTY;
+      const token = this.token;
+      this.logoutError.set('');
+      if (!token) { this.clearSession(); return of(undefined); }
+      this.loggingOut.set(true);
+      // Capturar el token: una respuesta tardía no debe borrar otra sesión recién iniciada.
+      return this.http.post<void>(`${environment.apiUrl}/auth/logout`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      }).pipe(
+        timeout(10000),
+        catchError(error => error.status === 401 ? of(undefined) : throwError(() => error)),
+        tap(() => this.clearSession(token)),
+        map(() => undefined),
+        catchError(error => {
+          this.logoutError.set('No se pudo confirmar el cierre. Comprueba tu conexión y pulsa Salir otra vez.');
+          return throwError(() => error);
+        }),
+        finalize(() => this.loggingOut.set(false)),
+      );
+    });
+  }
+
+  clearSession(expectedToken: string | null = this.token): boolean {
+    if (this.token !== expectedToken) return false;
+    this.clearToken(); this.clearUser();
+    return true;
   }
 
   get token(): string | null {

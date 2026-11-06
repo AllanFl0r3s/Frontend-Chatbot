@@ -50,19 +50,19 @@ La guía está en [registro.md](../registro.md). Son cuentas locales con datos f
 |---|---|
 | Login | Funciona localmente; pendiente en la URL pública. |
 | Registro público | Implementado y probado localmente con POST /auth/register; interfaz confirmada por el autor; falta publicar. |
-| Logout | El navegador retira sus datos de sesión; falta invalidación en servidor. |
+| Logout | Implementado con sesión AUTH persistida: 204 al cerrar, token anterior 401 y otras sesiones vigentes. Comprobado por HTTP/SQL; prueba manual/pública pendiente. |
 | Recuperación de contraseña | Brevo configurado en privado, correo recibido y cambio/login con contraseña nueva confirmados manualmente por el autor. Pendiente en producción pública. |
 | Matriz de permisos y propiedad | Primera versión documentada y control /users corregido. |
 | Dos roles funcionales | ADMINISTRADOR y USUARIO comprobados por HTTP con SQL local y cuentas reales de demostración; falta la validación completa en producción. |
 | Credenciales para el docente | La cuenta USUARIO local tiene sus credenciales fuera del repositorio; las de la entrega pública y su comunicación privada siguen pendientes. |
-| Validación de usuarios/roles vigentes | Implementada en avance 18; estado/rol actual y huella de contraseña en cada petición. Logout por sesión pendiente. |
+| Validación de usuarios/roles vigentes | Implementada en avance 18; estado/rol actual y huella de contraseña en cada petición. Logout individual implementado en avance 20. |
 | Frontend, backend y base públicos por HTTPS | Pendiente. Vercel sigue siendo una vista previa. |
 | Release semana-4 | No creado todavía. |
-| 20 commits y 3 recientes | Este registro de evidencia deja 19 commits en el frontend; continuar hasta cumplir el mínimo y los requisitos funcionales. |
+| 20 commits y 3 recientes | El avance de cierre individual deja 20 commits en el frontend; continuar hasta cumplir el mínimo y los requisitos funcionales. |
 
 ## Siguiente paso
 
-Continuar con cierre de sesión con invalidación en servidor, despliegue y prueba completa. La recepción real y el login con contraseña nueva ya fueron confirmados localmente. El registro y la segunda cuenta local ya están comprobados. El presupuesto autorizado es cero: solo planes gratuitos o créditos estudiantiles comprobados antes de crear recursos.
+Confirmar Salir en la interfaz y, si se desea, repetir la suite en navegador desde una terminal nativa; continuar con despliegue y prueba completa. La recepción real y el login con contraseña nueva ya fueron confirmados localmente. El registro y la segunda cuenta local ya están comprobados. El presupuesto autorizado es cero: solo planes gratuitos o créditos estudiantiles comprobados antes de crear recursos.
 
 ## Avance 18 · recuperación y vigencia de acceso
 
@@ -79,3 +79,11 @@ Pendiente del avance de recuperación: cuenta/remitente/clave del proveedor, ent
 El 6 de noviembre de 2026 el autor configuró una clave de Brevo restringida a emails transaccionales y verificó su remitente. Se completaron las cuatro variables de recuperación en el .env privado del backend. Un primer intento respondió 503 porque el proceso conservaba la configuración anterior; después de reiniciar el backend, el autor confirmó que recibió el correo y que pudo establecer otra contraseña e iniciar sesión con ella.
 
 Esta es evidencia manual comunicada por el autor, adicional a las pruebas automáticas y SQL del avance 18. No se incluyen clave, destinatario, enlace ni contraseña en el repositorio. El rechazo manual de la contraseña anterior y del enlace reutilizado aún no fue confirmado; los dos casos ya tienen pruebas automáticas/local SQL. La prueba ocurrió en localhost, no certifica la URL pública. Continúan pendientes logout en servidor, despliegue y release semana-4.
+
+## Avance 20 · cierre individual persistido
+
+Se agregó POST /auth/logout, persistencia de accesos con canal AUTH en la tabla local TBL_SESIONES, sid nuevo por login y verificación de sesión en cada petición protegida. Chat y administración esperan confirmación del servidor antes de limpiar el acceso. Las sesiones de conversaciones WEB/WHATSAPP se conservan. No se cambió el esquema ni el .env privado. Los JWT anteriores sin sid requieren volver a iniciar sesión.
+
+Validación: backend compilado y 89 pruebas aprobadas (20 nuevas y 69 de regresión); 11 comprobaciones HTTP/SQL reales correctas, incluyendo ambos roles y persistencia tras reinicio. Cuenta y sesiones temporales eliminadas al finalizar; administrador, autor y conversaciones existentes conservados. Frontend compiló para desarrollo/SSR y preview. Sus 12 nuevas pruebas compilaron y se aprobaron con Jasmine/Angular TestBed en Node, simulando DOM mínimo, almacenamiento y navegación. La ejecución de Karma en navegador estuvo bloqueada; esta alternativa no sustituye la prueba visual. La prueba manual de Salir sigue pendiente.
+
+Guía y comandos en [sesiones-y-logout.md](../sesiones-y-logout.md). El frontend llega a 20 commits; no se creó release ni se marca semana 4 completa. Continúan pendientes publicación de backend/base por HTTPS, pruebas públicas por rol y revisión de credenciales/cuentas de entrega.

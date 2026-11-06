@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../core/auth.service';
 import { ChatApiService } from './chat-api.service';
 
 type Msg = { from: 'user' | 'bot'; text: string; at: Date };
@@ -66,6 +67,7 @@ export class ChatComponent implements OnInit {
   };
 
   constructor(
+    readonly auth: AuthService,
     private api: ChatApiService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: object,
@@ -202,12 +204,10 @@ export class ChatComponent implements OnInit {
   }
 
   logout(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('manda_token');
-      localStorage.removeItem('manda_user');
-    }
-
-    this.router.navigate(['/login']);
+    this.auth.logout().subscribe({
+      next: () => { if (!this.auth.token) void this.router.navigate(['/login']); },
+      error: () => { /* El servicio muestra el error y conserva la sesión para reintentar. */ },
+    });
   }
 
   removeMessage(index: number): void {

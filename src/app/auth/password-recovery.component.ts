@@ -54,7 +54,7 @@ export class PasswordRecoveryComponent implements OnDestroy {
       : this.auth.forgotPassword(email.trim().toLowerCase());
     this.request = operation.subscribe({
       next: () => {
-        if (this.reset) this.auth.logout();
+        if (this.reset) this.auth.clearSession();
         this.done.set(true); this.pending.set(false); this.form.reset(); this.token = '';
       },
       error: (failure: HttpErrorResponse) => {

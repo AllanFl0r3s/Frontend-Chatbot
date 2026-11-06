@@ -15,10 +15,11 @@
     </div>
 
     <a routerLink="/visits" style="color: inherit; text-decoration: underline; padding: .5rem;">Visitas</a>
-    <button class="logout-btn" type="button" (click)="logout()" title="Cerrar sesión">
+    <button class="logout-btn" type="button" (click)="logout()" [disabled]="auth.loggingOut()" title="Cerrar sesión">
       <span class="material-icons">logout</span>
     </button>
   </header>
+  <p *ngIf="auth.logoutError()" role="alert">{{ auth.logoutError() }}</p>
 
   <div
     class="profile-overlay"

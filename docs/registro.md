@@ -58,7 +58,7 @@ Son cuentas locales de demostración. Las cuentas y credenciales para la entrega
 ## Qué sigue pendiente
 
 - Recuperación de contraseña y proveedor real de correo.
-- Logout con invalidación en servidor. La revalidación de estado/rol/JWT y la revocación por cambio de contraseña se implementaron en el avance 18.
+- Logout individual y revalidación implementados en avances 18/20; falta repetir la prueba manual de Salir y publicarlos.
 - Pruebas manuales de la interfaz, límites de intentos y configuración de publicación.
 - Backend y base académica públicos por HTTPS, cuentas privadas de entrega y release semana-4.
 

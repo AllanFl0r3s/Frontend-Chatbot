@@ -11,7 +11,7 @@ import { AuthService } from '../core/auth.service';
   styleUrl: './users-layout.component.scss',
 })
 export class UsersLayoutComponent {
-  private readonly authService = inject(AuthService);
+  readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
   readonly logoUrl = '/assets/LOGO-WEB-IST.webp';
@@ -30,7 +30,9 @@ export class UsersLayoutComponent {
    * Cierra sesión y redirige al login
    */
   logout() {
-    this.authService.logout();
-    void this.router.navigate(['/login']);
+    this.authService.logout().subscribe({
+      next: () => { if (!this.authService.token) void this.router.navigate(['/login']); },
+      error: () => { /* Mensaje visible, sin afirmar un cierre que el servidor no confirmó. */ },
+    });
   }
 }

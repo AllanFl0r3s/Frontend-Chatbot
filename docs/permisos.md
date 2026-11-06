@@ -22,6 +22,7 @@ Permiso indica que el servidor deja llegar a la operación, no que todas las fun
 | Crear cuenta pública | POST /auth/register | Sí, con datos válidos | Sí, sin crear sesión automática | Sí, siempre crea USUARIO | Guarda de campos + DTO + rol 2 activo fijado por servidor. |
 | Solicitar recuperación | POST /auth/forgot-password | Sí, sujeto a límite | Sí | Sí | Respuesta genérica; correo al titular si activo; proveedor configurado localmente. |
 | Establecer contraseña recuperada | POST /auth/reset-password | Solo con enlace válido | Solo con enlace válido | Solo con enlace válido | Firma, propósito, audiencia, caducidad y huella vigente; cambio atómico invalida enlaces y JWT anteriores. |
+| Cerrar sesión actual | POST /auth/logout | No | Sí | Sí | JWT vigente y sesión AUTH del usuario; revocación SQL antes de 204. Otras sesiones se conservan. |
 | Listar usuarios | GET /users | No | No | Sí | JwtAuthGuard + AdminGuard. |
 | Consultar una cuenta | GET /users/:id | No | No, tampoco la propia por este endpoint | Sí | JwtAuthGuard + AdminGuard. |
 | Crear una cuenta administrativamente | POST /users | No | No | Sí | JwtAuthGuard + AdminGuard; no es registro público. |
@@ -49,10 +50,10 @@ Desde el avance 16, los cinco endpoints /users requieren administrador también 
 | Registro público | Visitante | El servidor asigna USUARIO; no acepta elegir administrador, activar roles ni concederse rutas desde el formulario. | Implementado localmente: POST /auth/register y /register. Ver docs/registro.md. |
 | Recuperar contraseña | Persona que controla el correo de su cuenta | Respuesta genérica, token con caducidad, un solo uso y almacenamiento protegido; envío al correo mediante el proveedor configurado. | Implementado localmente; correo recibido y cambio/login con contraseña nueva confirmados por el autor. |
 | Establecer contraseña recuperada | Portador del token válido de recuperación | Cambiar solo la cuenta vinculada al token; invalidar el token y las sesiones anteriores de esa cuenta. | Implementado localmente; correo recibido y cambio/login con contraseña nueva confirmados por el autor. |
-| Cerrar sesión en el servidor | Usuario autenticado, incluido administrador | Invalidar la sesión correspondiente; no aceptar un userId ajeno para cerrar otras sesiones. | Actualmente solo se retira token/usuario del navegador; el JWT puede seguir válido hasta vencer. |
-| Desactivar usuario/rol o cambiar permisos | Administrador | Las solicitudes posteriores deben consultar el estado y permisos vigentes; no conservar privilegios por un JWT antiguo. | Implementado: JWT consulta cuenta y rol activos, toma roleId vigente y comprueba huella de contraseña. Logout por sesión aún pendiente. |
+| Cerrar sesión en el servidor | Usuario autenticado, incluido administrador | Invalidar la sesión correspondiente; no aceptar un userId ajeno para cerrar otras sesiones. | Implementado en avance 20: revoca la sesión AUTH en SQL antes de limpiar navegador. Prueba manual/pública pendiente. |
+| Desactivar usuario/rol o cambiar permisos | Administrador | Las solicitudes posteriores deben consultar el estado y permisos vigentes; no conservar privilegios por un JWT antiguo. | Implementado: JWT consulta cuenta y rol activos, toma roleId vigente y comprueba huella de contraseña. Logout individual implementado en avance 20. |
 
-POST /auth/register ya está implementado. La recuperación está implementada y comprobada con recepción real en localhost; el logout en servidor sigue pendiente. No se presenta como existente una recuperación de contraseña que solo tenga un botón o una simulación de correo.
+POST /auth/register ya está implementado. La recuperación está implementada y comprobada con recepción real en localhost; el logout en servidor está implementado localmente. No se presenta como existente una recuperación de contraseña que solo tenga un botón o una simulación de correo.
 
 ## Propiedad y alcance del dato
 
@@ -67,7 +68,7 @@ POST /auth/register ya está implementado. La recuperación está implementada y
 ## Reglas adicionales que faltan antes de certificar semana 4
 
 - Ya hay dos cuentas de roles distintos comprobadas por HTTP contra SQL local. Preparar las cuentas privadas de entrega pública y repetir allí la prueba; no publicar sus credenciales.
-- Resolver la revocación de una sesión al cerrarla. La revalidación de usuario/rol y revocación por cambio de contraseña ya están implementadas en el avance 18.
+- Repetir en producción las comprobaciones de revocación individual, estado/rol y cambio de contraseña. Los controles locales de avances 18/20 están implementados y probados por HTTP/SQL.
 - Impedir que el administrador elimine/desactive la última cuenta administradora o pierda acceso por modificar su propia cuenta de forma insegura.
 - Revisar el borrado físico de usuarios: sesiones y mensajes heredados pueden quedar huérfanos. Preferir desactivación y definir conservación/integridad antes de habilitar borrados en el entorno público.
 - El registro público exige el rol USUARIO activo y el login exige rol activo. Completar las validaciones de rol en la creación/edición administrativa; crear nombres de rol no define por sí solo una política de acceso.

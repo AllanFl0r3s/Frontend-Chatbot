@@ -208,3 +208,7 @@ Para CHATBOT se conserva inicialmente el CASCADE sesión-mensajes ya existente. 
 Las nuevas migraciones académicas y su guía están en database/ de este mismo repositorio, para que el evaluador pueda revisarlas. Los scripts originales de instalación y el servicio de ejecución siguen en el backend hermano. La guía explica el requisito de la base local marcada y cómo preparar una base temporal de prueba. El script semilla está en database/seeds/ y su comprobación en database/tests/.
 
 La exigencia es **15 commits en total**, con al menos 3 en los últimos 10 días. Cada commit debe representar trabajo comprobable. Mantener en README el token académico requerido, que es distinto de cualquier contraseña o clave de API.
+
+## Sesiones de acceso · avance 20
+
+La tabla existente TBL_SESIONES de CHATBOT almacena accesos con Canal=AUTH, uno por login; CanalRef es un UUID y Contexto contiene version=1, expiresAt Unix y revokedAt. Se separan de los registros de conversación WEB/WHATSAPP. No almacena tokens JWT en claro. No se agregaron tablas ni restricciones: la relación Id_Usuario sigue sin FK en el esquema heredado, y su pertenencia se comprueba en servidor. No confundir estas filas de acceso con nuevas tablas del negocio ni con historial de mensajes. Ver [sesiones y logout](sesiones-y-logout.md).

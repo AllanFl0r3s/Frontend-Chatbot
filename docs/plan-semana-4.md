@@ -11,7 +11,7 @@ El frontend parte de 15 commits. La entrega exige al menos 20 en total, con 3 en
 | 16 | Auditar permisos, crear docs/permisos.md y exigir administrador en /users desde el backend. | Primer paso completado: compilación y 20 pruebas correctas; ver bitácora de semana 4. |
 | 17 | Registro público con rol USUARIO fijado por servidor, formulario y segunda cuenta local de demostración. El login comprueba rol activo; revalidar JWT existentes sigue pendiente. | Implementado y comprobado: 42 pruebas y 8 comprobaciones HTTP/SQL reales; ver docs/registro.md. |
 | 18 | Recuperación de contraseña y revalidación JWT, enlace limitado y cambio atómico, integración Brevo y pantallas. | Implementado y probado localmente; el avance 19 registra correo real recibido y login con contraseña nueva confirmados por el autor. Ver recuperacion-contrasena.md. |
-| Siguiente | Cierre de sesión con invalidación en servidor y reglas de acceso/propiedad, con pruebas permitidas y denegadas por rol. | Pendiente. |
+| 20 | Cierre de sesión individual persistido y botones conectados al servidor. | Backend: 89 pruebas y 11 comprobaciones HTTP/SQL correctas. Frontend compila y 12 pruebas unitarias pasan con TestBed en Node; Karma en navegador bloqueado. Prueba manual pendiente. |
 | Cierre | Publicar el flujo por HTTPS con base académica, probar cuentas por rol, completar docs/bitacora/semana-4.md y release semana-4. | Pendiente. No se marca entregado todavía. |
 
 La matriz actual, los controles corregidos y los huecos pendientes se describen en [permisos.md](permisos.md). Las credenciales por rol se entregarán al docente fuera del repositorio; no se agregarán contraseñas operativas a la bitácora ni a ejemplos públicos.

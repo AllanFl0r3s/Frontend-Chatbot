@@ -18,11 +18,12 @@
         Hola, {{ user()?.nombre || 'Usuario' }}
       </span>
 
-      <button type="button" class="ghost" (click)="logout()">
+      <button type="button" class="ghost" (click)="logout()" [disabled]="authService.loggingOut()">
         Salir
       </button>
     </div>
   </header>
+  <p *ngIf="authService.logoutError()" role="alert">{{ authService.logoutError() }}</p>
 
   <main class="shell__content">
     <router-outlet />
