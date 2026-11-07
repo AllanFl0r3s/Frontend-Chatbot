@@ -67,6 +67,30 @@
               "extractLicenses": false,
               "sourceMap": true
             },
+            "cloud": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.cloud.generated.ts"
+                }
+              ],
+              "outputPath": "dist/cloud",
+              "outputMode": "static",
+              "server": false,
+              "ssr": false,
+              "optimization": {
+                "scripts": true,
+                "styles": true,
+                "fonts": false
+              },
+              "extractLicenses": true,
+              "sourceMap": false,
+              "outputHashing": "all",
+              "budgets": [
+                { "type": "initial", "maximumWarning": "500kB", "maximumError": "1MB" },
+                { "type": "anyComponentStyle", "maximumWarning": "4kB", "maximumError": "8kB" }
+              ]
+            },
             "preview": {
               "fileReplacements": [
                 {

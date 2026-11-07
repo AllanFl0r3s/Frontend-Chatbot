@@ -9,6 +9,8 @@
     "test": "ng test",
     "serve:ssr:MANDAFRONT": "node dist/MANDAFRONT/server/server.mjs",
     "build:preview": "ng build --configuration preview",
+    "build:cloud": "node scripts/cloud-environment.cjs && ng build --configuration cloud",
+    "test:cloud-config": "node --test test/cloud-environment.test.cjs",
     "test:auth-session:node": "node test/run-auth-session-unit.cjs"
   },
   "prettier": {
