@@ -1,6 +1,6 @@
 # Conectar Vercel con el backend público
 
-Estado: build cloud preparado y separado del local. La URL pública del backend y la prueba completa desde Vercel todavía están pendientes. El vercel.json activo conserva la vista previa hasta que el backend esté listo.
+Estado al 7 de noviembre de 2026: frontend publicado en https://chatbot-clase-vista-previa.vercel.app y conectado a https://chatbotbackendlocal-1.onrender.com. El vercel.json activo usa build:cloud. La ejecución local sigue separada.
 
 ## Configuración
 
@@ -19,4 +19,8 @@ Las visitas ficticias están fechadas 2026-11-05. S08 devuelve 9 clientes y 13 r
 
 Pruebas de configuración: npm run test:cloud-config. Pruebas de sesión: npm run test:auth-session:node.
 
-Validación del 7 de noviembre de 2026: dos pruebas de configuración y doce de sesión correctas. Build cloud estático correcto con URL HTTPS de ejemplo, usada solo para compilar; no se publicó ese ejemplo. Persisten cuatro avisos previos de tamaño CSS. La optimización cloud conserva el enlace de fuentes para el navegador y evita descargarlas al compilar, después de un fallo DNS del entorno durante la primera compilación. La prueba real contra el backend público sigue pendiente.
+Validación del 7 de noviembre de 2026: dos pruebas de configuración y doce de sesión correctas. Build cloud estático correcto. La optimización cloud conserva el enlace de fuentes para el navegador y evita descargarlas al compilar.
+
+Despliegue Vercel verificado: dpl_4EKMENQYDAusTJvvR2s8Q5o1tJN1, estado READY, dominio público sin autenticación de Vercel. PUBLIC_API_URL está configurada en Production y Preview. El enlace /register muestra el formulario funcional.
+
+Prueba HTTP real: health 200, CORS para el dominio Vercel, registro 201, login 201 con rol USUARIO, administración rechazada 403, logout 204 y token revocado rechazado 401. Se creó una única cuenta sintética de verificación, sin datos personales ni correo enviado; su contraseña y token no se guardaron ni imprimieron. No se ha certificado recuperación por correo en nube ni una consulta de visitas autenticada: faltan la configuración privada de Brevo y la asignación de rutas a las cuentas autorizadas. La IA continúa sin configurar.
