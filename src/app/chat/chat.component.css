@@ -18,6 +18,16 @@
   background-size: 18px 18px;
 }
 
+.demo-notice {
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #344054;
+  background: #fff6da;
+  border-bottom: 1px solid #e6d6a7;
+}
+
 .topbar {
   height: 64px;
   min-height: 64px;

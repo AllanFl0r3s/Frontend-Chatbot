@@ -36,7 +36,19 @@ Introducción: «Estamos probando la aplicación. Realiza estas tareas como lo h
 | T08 | Ambos | Sal e intenta volver a una pantalla protegida. | Regreso al login; sin acceso a datos con la sesión cerrada. Verificar revocación HTTP aparte. |
 | T09 | Cuenta con correo propio | Recupera el acceso por correo e inicia sesión con otra contraseña. | Correo recibido, cambio y login correctos. Complementaria en sesión separada; no guardar enlace ni contraseña. |
 
-Ventas, pedidos, promociones y preguntas generales de IA no están certificados como disponibles. Si el menú invita a esas opciones y genera confusión, registrar el hallazgo. Registrar el arranque en frío de Render por separado, sin ocultar su impacto si afecta al participante.
+Después de publicar y comprobar el código del [menú completo](menu-academico.md), agregar las tareas comerciales siguientes. Hasta entonces no certificarlas como disponibles públicamente. No se evalúa IA general. Registrar el arranque en frío de Render por separado, sin ocultar su impacto si afecta al participante.
+
+Extensión comercial propuesta (10–15 minutos adicionales; ambos roles):
+
+| ID | Meta para el participante | Referencia del moderador |
+|---|---|---|
+| T10 | Consulta el pedido de demostración 0001001 e identifica sus cantidades. | 24 unidades del alias 001 y 2 del 005: 26 UN. |
+| T11 | Averigua las ventas netas de Quartz 600 ml de noviembre de 2026. | L 502.50; no confundir con existencias. |
+| T12 | Consulta la proyección de ese producto para noviembre de 2026. | 15 cajas; registro ficticio, no predicción calculada por IA. |
+| T13 | Consulta las notas del cliente de demostración DEMO001. | Dos notas: L 50 y L 25. |
+| T14 | Identifica una promoción vigente de demostración y consulta sus existencias. | Tres promociones en noviembre de 2026. Sin validez comercial; comprobar vigencia antes de la sesión. |
+
+T10–T14 son cobertura adicional del producto y se informan por separado; no cambian el recorrido común de H3 fijado antes de las pruebas. El estado sigue pendiente hasta recoger resultados de personas reales.
 
 ## Resultados por tarea
 

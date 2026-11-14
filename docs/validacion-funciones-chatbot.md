@@ -1,5 +1,7 @@
 # Validación funcional del chatbot — 14 de noviembre de 2026
 
+> Actualización posterior a este diagnóstico: se implementaron las fuentes académicas y correcciones de navegación. Los recorridos de las seis funciones pasan localmente; la migración SQL también está aplicada y verificada en Azure. Falta publicar el código y repetir el recorrido público. Ver [implementación y ejemplos actuales](menu-academico.md). El diagnóstico inicial se conserva como evidencia anterior a la corrección.
+
 ## Conclusión
 
 **No todas las funciones del menú están operativas en el entorno académico local.** El recorrido de stock probado funciona con cinco productos; el sexto no se encuentra por nombre. Pedidos, ventas, proyecciones, notas de crédito y promociones abren algunos mensajes/menús, pero fallan al intentar completar la consulta. No presentar esos menús iniciales como evidencia de funcionamiento completo.
