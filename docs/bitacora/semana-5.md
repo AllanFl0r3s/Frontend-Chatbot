@@ -41,3 +41,11 @@ El propietario aún no tiene participantes. Se prepararon [guion, registro y cri
 ## Siguiente avance
 
 Invitar participantes y preparar cuentas/rutas privadamente. Realizar primero una sesión USUARIO; anotar tiempos, ayuda y hallazgos. Repetir con ADMINISTRADOR usando una cuenta ficticia editable, sin eliminar/desactivar al último administrador. Crear issues, corregir los bloqueantes y verificarlos públicamente antes del release.
+
+## 14 de noviembre — validación de las funciones antes de las sesiones
+
+El propietario confirmó el avance documental anterior en 45e45a1: frontend con 24 commits antes de esta actualización. No se ha creado el commit siguiente ni el release semana-5.
+
+Se ejecutaron 9 pruebas automatizadas de menú, aprobadas, y peticiones autenticadas contra SQL local: stock de cinco productos y detalle por bodega, visitas, lectura administrativa y logout correctos. Buscar jabón falla con y sin tilde. Pedidos, ventas, proyecciones, notas de crédito y promociones devuelven 500 al completar la consulta por fuentes heredadas no disponibles. La presencia de un submenú no prueba que la función esté integrada.
+
+El intento de revalidar el backend público terminó sin respuesta dentro del plazo; no se obtuvo una sesión pública. No se extrapolan estos resultados locales a Azure. Se documentaron método, pasos, resultados y limitaciones en [validación funcional](../validacion-funciones-chatbot.md). Se propone alinear el menú con el alcance académico antes de invitar participantes. Las sesiones y la decisión sobre H3 siguen pendientes; estos resultados son técnicos.

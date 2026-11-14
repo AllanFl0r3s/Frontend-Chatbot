@@ -6,6 +6,8 @@
 |---|---|---|---|---|---|
 | H-01 | Propietario: recuperación pública no disponible por ausencia de BREVO_API_KEY y RECOVERY_FROM_EMAIL en Render. | Grave: impide recuperar acceso. | Un reporte del propietario; no medida con participantes. | Configuradas por el propietario; confirmó recuperación pública el 13/11. Falta registrar despliegue y probar rechazos de enlace usado/contraseña anterior. Issue no creado. | Semana 5: trazabilidad y T09. |
 | H-02 | Código: UsersService.update/remove no comprueba si una operación deja cero administradores activos. | Grave potencial: pérdida de administración. | No medida; no se ejecutó una operación destructiva en Azure. | Pendiente de corrección/prueba aislada. Issue no creado. | Semana 6, antes de ampliar administración. Si bloquea una sesión, resolver antes de cerrar semana 5. |
+| H-03 | HTTP/SQL local 14/11: el menú ofrece pedidos, ventas, proyecciones, notas y promociones, pero completar cada consulta devuelve 500 por fuentes heredadas no disponibles. | Grave: promete recorridos que no se pueden completar. | Una secuencia técnica reproducida por función; participantes no medidos. | Pendiente alinear el menú al alcance o integrar fuentes académicas. No reproducido hoy en Azure. Issue no creado. | Semana 5: definir alcance real antes de sesiones. |
+| H-04 | HTTP local 14/11: stock de jabón no encuentra el producto, con o sin tilde, aunque la semilla tiene 212 unidades. | Moderada: búsqueda por nombre incompleta. | Dos variantes en comprobación técnica; frecuencia de participantes no medida. | Pendiente investigar normalización/consulta. Catálogo Azure distinto: no confirmado allí. Issue no creado. | Semana 6 si solo afecta al catálogo local; adelantar si afecta al recorrido público. |
 
 ## Borradores de issues
 
@@ -30,6 +32,8 @@ Situación: /users exige administrador, pero el servicio guarda roleId/estado o 
 Aceptación: rechazar eliminación, desactivación o cambio de rol que deje cero administradores activos, también bajo concurrencia; conservar cambios legítimos cuando quede otro administrador. Probar con base temporal o persistencia aislada y respuesta HTTP clara. Registrar commit/PR y verificar el código desplegado sin arriesgar al único administrador público. No conceder permisos a participantes para reproducir este caso.
 
 ## Hallazgos futuros de participantes
+
+La evidencia técnica y los pasos de H-03/H-04 están en [validación funcional del 14/11](validacion-funciones-chatbot.md). Para publicar H-03 en el backend: título «Alinear el menú académico con las consultas disponibles», incluir las cinco secuencias de ese informe, esperado = respuesta funcional o indisponibilidad explícita sin 500, y aceptación = menú e implementación coherentes, sin inventar datos, con pruebas de regresión. No se ha creado el issue en GitHub.
 
 Registrar ID, tarea/pasos, esperado/observado, participantes anónimos afectados y n/N, severidad, enlace al issue si grave/bloqueante, responsable, semana objetivo, estado y revalidación pública con commit/despliegue.
 
