@@ -1,0 +1,58 @@
+{
+  "date": "2026-11-21",
+  "timezone": "America/Tegucigalpa",
+  "environment": "HTTP local y SQL académico real",
+  "backend": "e6ac25d",
+  "cases": [
+    {
+      "name": "Sin JWT: 401",
+      "result": "correcto"
+    },
+    {
+      "name": "Login local: 201",
+      "result": "correcto"
+    },
+    {
+      "name": "S08 página 1: 9 clientes, 13 registros y 5 filas",
+      "result": "correcto"
+    },
+    {
+      "name": "S08 página 2: 4 filas y totales conservados",
+      "result": "correcto"
+    },
+    {
+      "name": "S08 página fuera de rango: sin filas y total 9",
+      "result": "correcto"
+    },
+    {
+      "name": "S09: 3 clientes y 3 registros",
+      "result": "correcto"
+    },
+    {
+      "name": "Fecha sin registros: cero clientes y lista vacía",
+      "result": "correcto"
+    },
+    {
+      "name": "Ruta sin asignación: 403",
+      "result": "correcto"
+    },
+    {
+      "name": "Fecha imposible: 400",
+      "result": "correcto"
+    },
+    {
+      "name": "Página cero: 400",
+      "result": "correcto"
+    },
+    {
+      "name": "Logout local: 204",
+      "result": "correcto"
+    },
+    {
+      "name": "JWT revocado: 401",
+      "result": "correcto"
+    }
+  ],
+  "passed": 12,
+  "failed": 0
+}
