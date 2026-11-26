@@ -1,0 +1,40 @@
+<main class="demo-page">
+  <nav class="demo-nav" aria-label="Demostración"><a routerLink="/chat">← Volver al chatbot</a><span class="pill">Datos ficticios</span></nav>
+  <header class="demo-hero">
+    <p class="eyebrow">ISTMANIA · SESIÓN DE DEMOSTRACIÓN</p>
+    <h1>Prueba el chatbot.<br>Tu experiencia nos ayuda a mejorarlo.</h1>
+    <p>Explora las consultas que usarías en tu trabajo y cuéntanos qué resultó claro o difícil. Evaluamos la herramienta, no tu desempeño.</p>
+    <div class="hero-actions"><a class="button" routerLink="/chat" target="_blank" rel="noopener">Abrir chat para probar ↗</a><a href="#opinion">Dejar mi opinión</a></div>
+  </header>
+  <section class="panel intro" aria-labelledby="before-title">
+    <h2 id="before-title">Antes de empezar</h2>
+    <ol><li>Usa tu cuenta de demostración y elige dos o tres consultas relevantes para ti.</li><li>Intenta resolver la tarea. Si necesitas ayuda, abre «Ver pasos» y anótalo en tu opinión.</li><li>Responde el formulario al terminar. No escribas nombres, clientes, precios ni información confidencial de la empresa.</li></ol>
+    <p class="muted">Los datos corresponden a ejemplos académicos de noviembre de 2026. Las existencias, ventas y promociones no representan operaciones reales. Otras opciones del menú quedan fuera de esta sesión.</p>
+  </section>
+  <section aria-labelledby="tasks-title"><h2 id="tasks-title">¿Qué te gustaría consultar?</h2>
+    <div class="task-grid"><article class="panel task" *ngFor="let task of tasks; let i = index">
+      <span class="task-number">0{{i + 1}}</span><h3>{{task.title}}</h3><p>{{task.goal}}</p>
+      <details><summary>Ver pasos de ayuda</summary><ol><li *ngFor="let step of task.steps"><code>{{step}}</code></li></ol><p class="muted">Envía cada mensaje por separado. {{task.hint}}</p></details>
+      <a href="#opinion" (click)="choose(task.id)">Opinar sobre esta consulta ↓</a>
+    </article></div>
+  </section>
+  <section class="panel feedback" id="opinion" aria-labelledby="feedback-title">
+    <div><p class="eyebrow">DOS MINUTOS PARA MEJORAR</p><h2 id="feedback-title">¿Cómo te fue?</h2><p>No hay respuestas correctas. También nos sirve saber qué no funcionó.</p></div>
+    <div class="success" role="status" *ngIf="saved()">Tu opinión quedó registrada con la referencia #{{saved()}}. Gracias por ayudarnos a mejorar.<button type="button" class="secondary" (click)="newOpinion()">Registrar otra opinión</button></div>
+    <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="!saved()">
+      <fieldset [disabled]="pending()">
+        <div class="form-grid">
+          <label>Consulta evaluada<select formControlName="task"><option value="general">Experiencia general</option><option *ngFor="let task of tasks" [value]="task.id">{{task.title}}</option></select></label>
+          <label>¿Pudiste completar la tarea?<select formControlName="outcome"><option value="">Selecciona una respuesta</option><option value="completed">Sí, sin ayuda</option><option value="assisted">Sí, con pasos o ayuda de otra persona</option><option value="blocked">No pude completarla</option></select></label>
+          <label>Facilidad de uso<select formControlName="ease"><option [ngValue]="0">Selecciona: 1 muy difícil · 5 muy fácil</option><option *ngFor="let score of scores" [ngValue]="score">{{score}} de 5</option></select></label>
+          <label>Utilidad para tu trabajo<select formControlName="usefulness"><option [ngValue]="0">Selecciona: 1 nada útil · 5 muy útil</option><option *ngFor="let score of scores" [ngValue]="score">{{score}} de 5</option></select></label>
+        </div>
+        <label>¿Qué mejorarías? <span class="muted">Opcional</span><textarea formControlName="comment" rows="4" maxlength="1000" placeholder="Por ejemplo: me costó identificar el período de la venta o no entendí cómo volver al menú."></textarea></label>
+        <p class="muted">{{form.controls.comment.value.length}}/1000 caracteres. No incluyas datos personales ni información de clientes.</p>
+        <label class="consent"><input type="checkbox" formControlName="consent"><span>Acepto registrar esta opinión para mejorar la demostración. Se vincula a mi cuenta; no es una encuesta anónima. Solo los administradores pueden revisar los comentarios.</span></label>
+        <p class="error" role="alert" *ngIf="error()">{{error()}}</p>
+        <div class="hero-actions"><button type="submit" [disabled]="pending()">{{pending() ? 'Guardando…' : 'Enviar mi opinión'}}</button><button *ngIf="error()" type="button" class="secondary" (click)="newOpinion()">Empezar un nuevo envío</button></div>
+      </fieldset>
+    </form>
+  </section>
+</main>

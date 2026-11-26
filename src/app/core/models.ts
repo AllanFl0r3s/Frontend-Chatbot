@@ -6,6 +6,8 @@ export interface Role {
 }
 
 export interface User {
+  rutaCodigo?: string | null;
+  rutasAsignadas?: string[];
   id: number;
   roleId: number;
   roleName?: string;
@@ -19,6 +21,7 @@ export interface User {
 }
 
 export interface UserInput {
+  rutaCodigo?: string | null;
   nombre: string;
   usuario: string;
   email: string;

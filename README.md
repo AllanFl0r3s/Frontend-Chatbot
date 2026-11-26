@@ -1,6 +1,8 @@
 ﻿LEARN-CAP-72EA885A
 # Chatbot académico — semana 6 en preparación
 
+> Avance 23/11/2026: el backend local ya tiene historial de compras y promociones sugeridas con datos ficticios. No requiere cambiar las pantallas Angular. Las copias de la migración 006 y su verificador 007 están en database; la migración 006 ya se aplicó y verificó en Azure; la publicación del backend y su prueba pública siguen pendientes. Ver docs/replica-historial-promociones.md.
+
 Aplicación: https://chatbot-clase-vista-previa.vercel.app
 
 Backend: https://chatbotbackendlocal-1.onrender.com/health

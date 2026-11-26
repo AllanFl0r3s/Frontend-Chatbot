@@ -69,6 +69,16 @@
         <span>Activo</span>
         <input type="checkbox" formControlName="estado" />
       </label>
+
+      <label>
+        <span>Ruta asignada · Zona Norte</span>
+        <select formControlName="rutaCodigo" aria-describedby="route-help">
+          <option value="">Sin ruta asignada</option>
+          <option *ngFor="let ruta of rutas" [value]="ruta">{{ ruta }} · Norte</option>
+        </select>
+        <small id="route-help">La cuenta podrá consultar los clientes, historial y visitas de esta ruta. Sin ruta asignada se retira ese acceso.</small>
+        <small *ngIf="currentRoutes.length > 1">Rutas actuales: {{ currentRoutes.join(', ') }}. Si cambias la selección, se reemplazan por la ruta elegida.</small>
+      </label>
     </div>
 
     <label class="password">
@@ -85,7 +95,7 @@
     </label>
 
     <div class="actions">
-      <button type="submit" class="primary" [disabled]="isSubmitting">
+      <button type="submit" class="primary" [disabled]="isSubmitting || loadingUser || loadFailed">
         {{ isSubmitting ? 'Guardando...' : 'Guardar' }}
       </button>
       <span class="error" *ngIf="errorMessage">{{ errorMessage }}</span>

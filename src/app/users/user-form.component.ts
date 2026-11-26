@@ -22,13 +22,18 @@ export class UserFormComponent implements OnInit {
   userId: number | null = null;
   isSubmitting = false;
   errorMessage = '';
+  loadingUser = false;
+  loadFailed = false;
+  readonly rutas = Array.from({ length: 10 }, (_, i) => `S${String(i + 1).padStart(2, '0')}`);
+  currentRoutes: string[] = [];
 
   readonly form = this.fb.nonNullable.group({
     nombre: ['', [Validators.required, Validators.minLength(3)]],
     usuario: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
     password: [''],
-    roleId: [1, [Validators.required, Validators.min(1)]],
+    roleId: [2, [Validators.required, Validators.min(1)]],
+    rutaCodigo: [''],
     telefonoNumero: [''],
     estado: [true],
   });
@@ -46,8 +51,11 @@ export class UserFormComponent implements OnInit {
   }
 
   private loadUser(id: number) {
+    this.loadingUser = true;
     this.usersService.getUser(id).subscribe({
       next: (user: User) => {
+        this.loadingUser = false;
+        this.currentRoutes = user.rutasAsignadas ?? (user.rutaCodigo ? [user.rutaCodigo] : []);
         this.form.patchValue({
           nombre: user.nombre ?? '',
           usuario: user.usuario ?? '',
@@ -55,15 +63,19 @@ export class UserFormComponent implements OnInit {
           roleId: user.roleId ?? 1,
           telefonoNumero: user.telefonoNumero ?? '',
           estado: user.estado,
+          rutaCodigo: user.rutaCodigo ?? '',
         });
       },
       error: () => {
+        this.loadingUser = false;
+        this.loadFailed = true;
         this.errorMessage = 'No se pudo cargar la información del usuario.';
       },
     });
   }
 
   submit() {
+    if (this.isSubmitting || this.loadingUser || this.loadFailed) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -121,6 +133,9 @@ export class UserFormComponent implements OnInit {
   telefonoNumero: values.telefonoNumero?.trim() || undefined,
   estado: values.estado,
 };
+if (!this.isEdit || this.form.controls.rutaCodigo.dirty) {
+  payload.rutaCodigo = values.rutaCodigo || null;
+}
 
 if (!this.isEdit) {
   payload.usuario = values.usuario.trim().toLowerCase();
