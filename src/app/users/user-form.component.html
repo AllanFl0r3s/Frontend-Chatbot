@@ -71,13 +71,13 @@
       </label>
 
       <label>
-        <span>Ruta asignada · Zona Norte</span>
+        <span>Ruta asignada · Cortés, zona norte</span>
         <select formControlName="rutaCodigo" aria-describedby="route-help">
           <option value="">Sin ruta asignada</option>
-          <option *ngFor="let ruta of rutas" [value]="ruta">{{ ruta }} · Norte</option>
+          <option *ngFor="let ruta of rutas" [value]="ruta.code">{{ routeLabel(ruta.code) }}</option>
         </select>
         <small id="route-help">La cuenta podrá consultar los clientes, historial y visitas de esta ruta. Sin ruta asignada se retira ese acceso.</small>
-        <small *ngIf="currentRoutes.length > 1">Rutas actuales: {{ currentRoutes.join(', ') }}. Si cambias la selección, se reemplazan por la ruta elegida.</small>
+        <small *ngIf="currentRoutes.length > 1">Rutas actuales: {{ routeLabels(currentRoutes) }}. Si cambias la selección, se reemplazan por la ruta elegida.</small>
       </label>
     </div>
 

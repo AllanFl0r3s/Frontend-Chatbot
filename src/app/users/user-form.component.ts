@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { UsersService } from '../core/users.service';
 import { User, UserInput } from '../core/models';
+import { CORTES_ROUTES, routeLabel, routeLabels } from '../core/cortes-routes';
 
 @Component({
   selector: 'app-user-form',
@@ -24,7 +25,9 @@ export class UserFormComponent implements OnInit {
   errorMessage = '';
   loadingUser = false;
   loadFailed = false;
-  readonly rutas = Array.from({ length: 10 }, (_, i) => `S${String(i + 1).padStart(2, '0')}`);
+  readonly rutas = CORTES_ROUTES;
+  readonly routeLabel = routeLabel;
+  readonly routeLabels = routeLabels;
   currentRoutes: string[] = [];
 
   readonly form = this.fb.nonNullable.group({

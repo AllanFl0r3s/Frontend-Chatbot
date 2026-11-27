@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { UsersService } from '../core/users.service';
 //import { RolesService } from '../core/roles.service';
 import { User } from '../core/models';
+import { routeLabels } from '../core/cortes-routes';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -14,6 +15,7 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './users-list.component.scss',
 })
 export class UsersListComponent implements OnInit {
+  readonly routeLabels = routeLabels;
   readonly users = signal<User[]>([]);
   readonly loading = signal<boolean>(true);
   readonly error = signal<string | null>(null);

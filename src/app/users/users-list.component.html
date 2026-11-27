@@ -46,7 +46,7 @@
           <th>Correo</th>
           <th>Teléfono</th>
           <th>Rol</th>
-          <th>Ruta · Norte</th>
+          <th>Ruta · Cortés</th>
           <th>Registro</th>
           <th>Acciones</th>
         </tr>
@@ -65,7 +65,7 @@
           <td>{{ user.telefonoNumero || '-' }}</td>
 
           <td>{{ user.roleName || ('Rol #' + user.roleId) }}</td>
-          <td>{{ user.rutasAsignadas?.join(', ') || user.rutaCodigo || 'Sin asignar' }}</td>
+          <td>{{ routeLabels(user.rutasAsignadas, user.rutaCodigo) }}</td>
 
           <td>{{ user.fechaRegistro | date: 'short' }}</td>
 
