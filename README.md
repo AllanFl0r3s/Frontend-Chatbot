@@ -1,5 +1,17 @@
 ﻿LEARN-CAP-72EA885A
-# Chatbot académico — semana 6 en preparación
+# Chatbot académico — semana 7 en preparación
+
+## Semana 7
+
+Entrega principal: Frontend-Chatbot. Estrategia por riesgo en [docs/pruebas.md](docs/pruebas.md), resultados en [bitácora de semana 7](docs/bitacora/semana-7.md) y pasos de publicación en [preparación del PR](docs/preparacion-pr-semana-7.md).
+
+El nuevo flujo añade **Consultar mi cartera** al chat y verifica login, permisos, saldos, pulperías y logout con Angular, Nest y SQL reales. La rama preparada es `semana-7/pipeline-cartera`. El pipeline está en [.github/workflows/ci.yml](.github/workflows/ci.yml). main ya está protegida con PR y dos comprobaciones obligatorias.
+
+Las pruebas y la compilación pasaron localmente. **Actions remoto, el nuevo PR mezclado, la publicación de este flujo y el release semana-7 todavía requieren el commit y push del propietario y su verificación posterior.** No se presenta un workflow local como evidencia de CI remoto en verde.
+
+Aplicación principal: [frontend-chatbot-alpha-six.vercel.app](https://frontend-chatbot-alpha-six.vercel.app). Las bases y cuentas CI son independientes de Azure. El workflow manual [Publicar semana-7](.github/workflows/release-semana-7.yml) comprueba CI, PR, protección, documentos y commits antes de publicar el release.
+
+## Historial de semanas 5 y 6
 
 > Avance 23/11/2026: el backend local ya tiene historial de compras y promociones sugeridas con datos ficticios. No requiere cambiar las pantallas Angular. Las copias de la migración 006 y su verificador 007 están en database; la migración 006 ya se aplicó y verificó en Azure; la publicación del backend y su prueba pública siguen pendientes. Ver docs/replica-historial-promociones.md.
 

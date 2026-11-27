@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../core/auth.service';
 import { ChatApiService } from './chat-api.service';
+import { EMPTY, concatMap, defer, finalize, tap } from 'rxjs';
 
 type Msg = { from: 'user' | 'bot'; text: string; at: Date };
 
@@ -110,6 +111,26 @@ export class ChatComponent implements OnInit {
     if (this.sending()) return;
     this.input = text;
     this.send();
+  }
+
+  viewWallet(): void {
+    if (this.sending()) return;
+    this.error.set(null);
+    this.sending.set(true);
+    const send = (text: string) => defer(() => {
+      this.messages.update(messages => [...messages, { from: 'user', text, at: new Date() }]);
+      return this.api.sendMessage(text).pipe(tap(reply => {
+        const texts = [reply.reply, reply.followUp].filter((text): text is string => !!text);
+        this.messages.update(messages => [...messages, ...texts.map(text => ({ from: 'bot' as const, text, at: new Date() }))]);
+        this.scrollToBottom();
+      }));
+    });
+    send('menu').pipe(
+      concatMap(() => send('7')),
+      // Una denegación se conserva en pantalla y no dispara otra opción del menú.
+      concatMap(reply => reply.reply.includes('Cartera y vencimientos') ? send('1') : EMPTY),
+      finalize(() => { this.sending.set(false); this.scrollToBottom(); }),
+    ).subscribe({ error: error => this.error.set(error?.error?.message || 'No se pudo consultar la cartera. Intenta de nuevo.') });
   }
 
   autoResize(ta: HTMLTextAreaElement): void {

@@ -619,3 +619,13 @@
   text-decoration: underline;
 }
 }
+.wallet-shortcut {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border: 1px solid #0f6a6a;
+  border-radius: 8px;
+  color: #075454;
+  background: #fff;
+  cursor: pointer;
+}
+.wallet-shortcut:disabled { opacity: .6; cursor: wait; }
