@@ -49,11 +49,11 @@ npm run test:browser:ci
 npm run test:e2e
 ```
 
-Para ejecución local de SQL se requiere BACKEND_DIR, CI_SQL_USER, CI_SQL_PASSWORD y CI_SQL_PORT. El script de pruebas configura CHROME_BIN con el Headless Shell de Playwright para Karma; esto evita el bloqueo observado con Chrome completo en Windows. El workflow configura las variables SQL automáticamente; nunca copiar las claves CI a Render.
+Para ejecución local de SQL se requiere BACKEND_DIR, CI_SQL_USER, CI_SQL_PASSWORD y CI_SQL_PORT. El script de pruebas configura CHROME_BIN con el Headless Shell de Playwright para Karma; esto evita el bloqueo observado con Chrome completo en Windows. Con CI=true usa el lanzador ChromeHeadlessNoSandbox incluido por Angular, porque Ubuntu rechazó el arranque con «No usable sandbox». El cambio afecta solo al navegador efímero de pruebas y no modifica la aplicación publicada ni la configuración del sistema. El workflow configura las variables SQL automáticamente; nunca copiar las claves CI a Render.
 
 ## Alcance y límites
 
-La cadena completa se comprobó localmente con SQL Server Express y Chromium en Windows. Su ejecución remota sobre Ubuntu y SQL Server 2022 se acredita con la URL real del run después del push. Un YAML creado o un resultado local no equivale a Actions en verde.
+La cadena completa se comprobó localmente con SQL Server Express y Chromium en Windows. El [run remoto](https://github.com/AllanFl0r3s/Frontend-Chatbot/actions/runs/46074459650) aprobó el job de frontend, las 196 pruebas del backend y la preparación de SQL Server 2022, pero falló al arrancar Karma. La corrección del lanzador aprobó 18 pruebas locales con CI=true; falta publicar y verificar ese ajuste en Ubuntu. Un YAML creado o un resultado local no equivale a Actions en verde.
 
 Responder 200 en login y health verifica disponibilidad HTTPS, no el flujo autenticado de producción. El tercer flujo debe llegar mediante PR y probarse después de Vercel antes del release. La recuperación por correo, los servicios empresariales reales y el desempeño con concurrencia no se certifican en esta entrega.
 

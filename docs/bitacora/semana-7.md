@@ -31,22 +31,22 @@ El botón conserva el borrador, evita consultas duplicadas y detiene la secuenci
 | YAML de ambos workflows | Sintaxis revisada con js-yaml |
 | main en GitHub | Protección aplicada y confirmada por API; PR y ambos checks obligatorios, incluso para administrador |
 | HTTPS público | Login de Vercel y health de Render respondieron 200 |
-| Actions remoto en verde | Pendiente del commit y push de la rama |
-| Tercer flujo mezclado y publicado | Pendiente del PR, despliegue y prueba autenticada en producción |
+| Actions remoto en verde | Frontend aprobado; el job SQL aprobó las 196 pruebas del backend y preparó las bases, pero falló al iniciar Chromium en Ubuntu. Corrección local pendiente de commit y push |
+| Tercer flujo mezclado y publicado | PR #20 abierto; pendientes merge, despliegue y prueba autenticada en producción |
 | Release semana-7 | Preparado; todavía no creado |
 
-Las 196 pruebas Jest del backend se ejecutan en el job E2E; la versión de referencia ya las había aprobado localmente. El contenedor Linux de Actions aún no ha ejecutado este workflow. La prueba local se realizó en Windows con SQL Server Express y Node 22.23.5.
+Las 196 pruebas Jest del backend y la preparación de SQL Server 2022 aprobaron en el [run remoto](https://github.com/AllanFl0r3s/Frontend-Chatbot/actions/runs/46074459650). Karma falló con «No usable sandbox» en Ubuntu. El lanzador ahora selecciona el ChromeHeadlessNoSandbox incluido por Angular únicamente cuando CI=true; las ejecuciones locales normales conservan el sandbox. Este ajuste aprobó las 18 pruebas en Windows con CI=true, pero todavía debe comprobarse en Ubuntu después del push. La prueba local de SQL se realizó en Windows con SQL Server Express y Node 22.23.5.
 
 ## Protección y entrega
 
 Se confirmó por API que main no estaba protegida y se configuró para requerir un PR y ambos checks aprobados, con rama actualizada, conversaciones resueltas y sin force push ni borrado. La regla incluye al administrador. No requiere una aprobación de otro revisor porque el repositorio lo mantiene una sola persona; sí exige pasar las pruebas y mezclar el PR.
 
-La rama preparada es `semana-7/pipeline-cartera`. El propietario hace su commit y push. No se hicieron commits ni push automáticos. Al empezar, el frontend tenía 34 commits y ocho en los últimos diez días. Hace falta al menos un commit real adicional en main para el mínimo de 35; no se fabricó historial para aumentar la cifra.
+La rama publicada es `semana-7/pipeline-cartera`, con 35 commits al abrir el [PR #20](https://github.com/AllanFl0r3s/Frontend-Chatbot/pull/20). El propietario hace sus commits y push. No se hicieron commits ni push automáticos. Main conserva 34 commits hasta el merge; no se fabricó historial para aumentar la cifra.
 
 Después del merge se debe esperar al pipeline de main y a Vercel, probar el botón en producción con una cuenta asignada a ruta y ejecutar Publicar semana-7 desde Actions. Ese workflow exige confirmar la prueba pública y se niega a publicar si no encuentra el PR mezclado y los checks de ese commit en verde.
 
 ## Límites y próximos pasos
 
-Una respuesta HTTPS 200 no demuestra por sí sola el flujo autenticado. Aún faltan las URL reales del nuevo PR, el run remoto y el release. La clasificación de vulnerabilidades de dependencias sigue pendiente; no se cambiaron versiones mayores para ocultar avisos de npm audit.
+Una respuesta HTTPS 200 no demuestra por sí sola el flujo autenticado. Aún faltan Actions completamente en verde, el merge y el release. La clasificación de vulnerabilidades de dependencias sigue pendiente; no se cambiaron versiones mayores para ocultar avisos de npm audit.
 
 Se usó Codex para revisar, implementar las pruebas y documentación, ejecutar verificaciones locales y configurar la protección de rama. Los resultados de producción y usuarios que no se observaron se dejaron expresamente pendientes.

@@ -15,7 +15,10 @@ function find(directory, depth = 0) {
 }
 const chrome = fs.existsSync(headless) && find(headless);
 if (!chrome) throw Error('Ejecuta npx playwright install chromium antes de las pruebas de navegador.');
-const result = spawnSync(process.execPath, [require.resolve('@angular/cli/bin/ng.js'), 'test', '--watch=false', '--browsers=ChromeHeadless'],
+// Angular supplies this launcher for isolated CI environments where Linux
+// cannot create Chromium's sandbox. Regular local runs keep the default sandbox.
+const browser = process.env.CI === 'true' ? 'ChromeHeadlessNoSandbox' : 'ChromeHeadless';
+const result = spawnSync(process.execPath, [require.resolve('@angular/cli/bin/ng.js'), 'test', '--watch=false', `--browsers=${browser}`],
   { stdio: 'inherit', env: { ...process.env, CHROME_BIN: chrome } });
 if (result.error) throw result.error;
 process.exitCode = result.status ?? 1;
