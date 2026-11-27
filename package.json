@@ -11,7 +11,12 @@
     "build:preview": "ng build --configuration preview",
     "build:cloud": "node scripts/cloud-environment.cjs && ng build --configuration cloud",
     "test:cloud-config": "node --test test/cloud-environment.test.cjs",
-    "test:auth-session:node": "node test/run-auth-session-unit.cjs"
+    "test:auth-session:node": "node test/run-auth-session-unit.cjs",
+    "test:unit:ci": "node test/run-auth-session-unit.cjs test/week7-unit-entry.ts",
+    "test:e2e": "playwright test",
+    "test:ci:database": "node scripts/ci/bootstrap-db.cjs",
+    "test:browser:ci": "node scripts/ci/test-browser.cjs",
+    "test:e2e:types": "tsc -p tsconfig.e2e.json"
   },
   "prettier": {
     "printWidth": 100,
@@ -43,6 +48,7 @@
     "@angular/build": "^20.3.8",
     "@angular/cli": "^20.3.8",
     "@angular/compiler-cli": "^20.3.0",
+    "@playwright/test": "1.65.1",
     "@types/express": "^5.0.1",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^20.17.19",

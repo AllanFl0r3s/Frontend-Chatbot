@@ -15,7 +15,7 @@
     </div>
 
     <a routerLink="/visits" style="color: inherit; text-decoration: underline; padding: .5rem;">Visitas</a>
-    <button class="logout-btn" type="button" (click)="logout()" [disabled]="auth.loggingOut()" title="Cerrar sesión">
+    <button class="logout-btn" type="button" (click)="logout()" [disabled]="auth.loggingOut()" title="Cerrar sesión" aria-label="Cerrar sesión">
       <span class="material-icons">logout</span>
     </button>
   </header>
@@ -217,6 +217,7 @@
       <div class="card-header">
         <div class="card-title">Asistente</div>
         <div class="card-hint">Respuestas limitadas al dominio del sistema</div>
+        <button class="wallet-shortcut" type="button" (click)="viewWallet()" [disabled]="sending()">Consultar mi cartera</button>
       </div>
 
       <div class="chat" #scrollRef (click)="closeMenu()">

@@ -1,0 +1,83 @@
+name: Semana 7 - Pipeline
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: semana7-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  frontend:
+    name: 'Frontend: pruebas y build'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:cloud-config
+      - run: npm run test:unit:ci
+      - run: npm run test:e2e:types
+      - run: npm run build:cloud
+        env:
+          PUBLIC_API_URL: https://chatbotbackendlocal-1.onrender.com
+  e2e:
+    name: 'E2E: cartera con SQL'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      sql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_PID: Developer
+          MSSQL_SA_PASSWORD: 'CI_Only_NotProduction_7!Green'
+        ports:
+          - 14339:1433
+    env:
+      BACKEND_DIR: ${{ github.workspace }}/.ci/backend
+      CI_SQL_HOST: 127.0.0.1
+      CI_SQL_PORT: '14339'
+      CI_SQL_USER: sa
+      CI_SQL_PASSWORD: 'CI_Only_NotProduction_7!Green'
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Leer versión del backend
+        id: backend
+        run: echo "ref=$(cat scripts/ci/backend-ref)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: AllanFl0r3s/ChatbotBackendLocal
+          ref: ${{ steps.backend.outputs.ref }}
+          path: .ci/backend
+          persist-credentials: false
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            .ci/backend/package-lock.json
+      - run: npm ci
+      - run: npm ci --prefix .ci/backend
+      - run: npm run build --prefix .ci/backend
+      - run: npm test --prefix .ci/backend -- --runInBand
+      - run: node scripts/ci/bootstrap-db.cjs
+      - run: npx playwright install --with-deps chromium
+      - name: Unitarias Angular en navegador
+        run: npm run test:browser:ci
+      - run: npx playwright test
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: semana-7-evidencia-e2e
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+          if-no-files-found: ignore

@@ -1,0 +1,29 @@
+name: Publicar semana-7
+on:
+  workflow_dispatch:
+    inputs:
+      production_verified:
+        description: 'Probé en producción el acceso, Consultar mi cartera, una pulpería y el cierre de sesión'
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: write
+  actions: read
+  pull-requests: read
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '22'
+      - run: node scripts/ci/release-week7.cjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PRODUCTION_VERIFIED: ${{ inputs.production_verified }}

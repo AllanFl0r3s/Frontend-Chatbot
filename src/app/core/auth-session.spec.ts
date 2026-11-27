@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { provideHttpClient, withInterceptors, HttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
@@ -16,6 +17,7 @@ describe('Cierre confirmado por servidor y errores de sesión', () => {
     localStorage.setItem('manda_user', JSON.stringify({ id: 2, roleId: 2, nombre: 'Fixture' }));
     router.navigateByUrl.calls.reset();
     TestBed.configureTestingModule({ providers: [
+      provideZonelessChangeDetection(),
       provideHttpClient(withInterceptors([authInterceptor])), provideHttpClientTesting(),
       { provide: Router, useValue: router },
     ] });

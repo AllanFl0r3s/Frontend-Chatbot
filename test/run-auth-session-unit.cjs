@@ -21,7 +21,7 @@ const load=createRequire(path.join(front,'package.json'));
  TestBed.initTestEnvironment(BrowserTestingModule,platformBrowserTesting());
  beforeEach(()=>TestBed.configureTestingModule({providers:[provideZonelessChangeDetection(),{provide:PLATFORM_ID,useValue:'browser'}]}));
  const output=path.join(front,'out-tsc/auth-session-node.spec.mjs');
- await load('esbuild').build({entryPoints:[path.join(front,'src/app/core/auth-session.spec.ts')],outfile:output,
+ await load('esbuild').build({entryPoints:[path.join(front,process.argv[2]||'src/app/core/auth-session.spec.ts')],outfile:output,
   bundle:true,format:'esm',platform:'node',target:'es2022',external:['@angular/*','rxjs'],logLevel:'silent'});
  let passed=0,failed=0;
  env.addReporter({specDone:result=>{
